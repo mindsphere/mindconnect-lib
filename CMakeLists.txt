@@ -1,0 +1,122 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10 FATAL_ERROR)
+
+# Set verbose mode for make process.
+SET(CMAKE_VERBOSE_MAKEFILE ON)
+
+# Project name.
+FILE(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/mcl_core/include/mcl_core/mcl_version.h" MCL_VERSION_STRING REGEX "^#define MCL_VERSION_STRING*")
+STRING(REPLACE "#define MCL_VERSION_STRING" "" MCL_VERSION_STRING ${MCL_VERSION_STRING})
+STRING(REPLACE "\"" "" MCL_VERSION_STRING ${MCL_VERSION_STRING})
+STRING(REPLACE " " "" MCL_VERSION_STRING ${MCL_VERSION_STRING})
+PROJECT(MindConnectLibrary VERSION ${MCL_VERSION_STRING} LANGUAGES C)
+MESSAGE(STATUS "MCL Version = ${MCL_VERSION_STRING}")
+SET(CMAKE_C_STANDARD 99)
+SET(CMAKE_C_STANDARD_REQUIRED ON)
+
+# Set path of MCL's root Cmake directory.
+SET(MCL_CMAKE_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+INCLUDE(CheckIncludeFile)
+
+# Check for header files.
+CHECK_INCLUDE_FILE("stdio.h"  HAVE_STDIO_H_)
+CHECK_INCLUDE_FILE("stddef.h" HAVE_STDDEF_H_)
+CHECK_INCLUDE_FILE("string.h" HAVE_STRING_H_)
+CHECK_INCLUDE_FILE("stdlib.h" HAVE_STDLIB_H_)
+CHECK_INCLUDE_FILE("stdint.h" HAVE_STDINT_H_)
+CHECK_INCLUDE_FILE("stdarg.h" HAVE_STDARG_H_)
+CHECK_INCLUDE_FILE("syslog.h" HAVE_SYSLOG_H_)
+CHECK_INCLUDE_FILE("time.h"   HAVE_TIME_H_)
+
+LIST(APPEND STANDARD_HEADER_MACROS HAVE_STDIO_H_ HAVE_STDDEF_H_ HAVE_STRING_H_ HAVE_STDLIB_H_ HAVE_STDINT_H_ HAVE_STDARG_H_ HAVE_TIME_H_)
+FOREACH(STANDARD_HEADER_MACRO ${STANDARD_HEADER_MACROS})
+    STRING(REPLACE "HAVE_" "" STANDARD_HEADER_FILE ${STANDARD_HEADER_MACRO})
+    STRING(REPLACE "_H_" ".H" STANDARD_HEADER_FILE ${STANDARD_HEADER_FILE})  
+    IF(${STANDARD_HEADER_MACRO})
+        MESSAGE(STATUS "Standard header ${STANDARD_HEADER_FILE} is found.")  
+    ELSE()
+        MESSAGE(FATAL_ERROR "FATAL ERROR : Build process terminated because ${STANDARD_HEADER_FILE} is NOT found.")     
+    ENDIF()    
+ENDFOREACH()
+
+IF(HAVE_SYSLOG_H_)
+    ADD_DEFINITIONS(-DHAVE_SYSLOG_H_=1)
+ELSE()
+    ADD_DEFINITIONS(-DHAVE_SYSLOG_H_=0)
+ENDIF()
+
+FIND_PROGRAM(RUBY_FOUND ruby)
+
+# Set flags for coverage output.
+STRING(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
+IF(CMAKE_COMPILER_IS_GNUCC AND (CMAKE_BUILD_TYPE_LOWER MATCHES debug))
+    MESSAGE(STATUS "Coverage output with GNU CC generated.")
+    SET(GCC_COVERAGE_COMPILE_FLAGS "-fprofile-arcs -ftest-coverage")
+    SET(GCC_COVERAGE_LINK_FLAGS "-lgcov")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
+ENDIF()
+
+# Use solution folders.
+SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+
+# Set output folder for all targets.
+# First for the generic no-config case (e.g. with mingw).
+SET(MCL_OUTPUT_DIR ${CMAKE_BINARY_DIR}/build/${CMAKE_BUILD_TYPE})
+SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${MCL_OUTPUT_DIR})
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${MCL_OUTPUT_DIR})
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${MCL_OUTPUT_DIR})
+
+# Second, for multi-config builds (e.g. msvc).
+FOREACH(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
+    STRING(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
+    SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${MCL_OUTPUT_DIR})
+    SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${MCL_OUTPUT_DIR})
+    SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${MCL_OUTPUT_DIR})
+ENDFOREACH()
+
+# Set variables for distribution package destination.
+SET(PACKAGE_DESTINATION_INCLUDE "include")
+SET(PACKAGE_DESTINATION_LIB "lib")
+SET(PACKAGE_DESTINATION_DOC "doc")
+
+# Define file system presence on the target.
+OPTION(HAVE_FILE_SYSTEM_ "The target has a file system." ON)
+
+# Add a global definition.
+IF(HAVE_FILE_SYSTEM_)
+    ADD_DEFINITIONS(-DHAVE_FILE_SYSTEM_=1)
+ELSE()
+    ADD_DEFINITIONS(-DHAVE_FILE_SYSTEM_=0)
+ENDIF()
+
+# Set log level if provided during call of cmake.
+IF(MCL_LOG_LEVEL)
+    MESSAGE(STATUS "Compile log level set to ${MCL_LOG_LEVEL}.")
+    ADD_DEFINITIONS(-DMCL_LOG_LEVEL=${MCL_LOG_LEVEL})
+ENDIF()
+
+# Option to compile connectivity extension.
+OPTION(MCL_CONNECTIVITY "Option to compile connectivity extension." ON)
+
+# Option to compile data lake extension.
+OPTION(MCL_DATA_LAKE "Option to compile data lake extension." ON)
+
+# Option to set if MCL build as static or dynamic.
+OPTION(MCL_STATICLIB "Option to build static or dynamic." OFF)
+
+# Option to enable testing for mcl_core and all extensions.
+OPTION(MCL_TEST "Option to build test executables." OFF)
+
+# Option to enable or disable creation of documentation.
+OPTION(MCL_DOC "Option to generate documentation." OFF)
+
+ADD_SUBDIRECTORY(mcl_core)
+
+IF(MCL_CONNECTIVITY)
+    ADD_SUBDIRECTORY(mcl_connectivity)
+ENDIF()
+
+IF(MCL_DATA_LAKE)
+    ADD_SUBDIRECTORY(mcl_data_lake)
+ENDIF()

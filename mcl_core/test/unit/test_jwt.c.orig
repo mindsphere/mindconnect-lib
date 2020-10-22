@@ -1,0 +1,488 @@
+/*!
+ * @file     test_jwt.c
+ * @brief    Unit test cases for testing JWT module.
+ *
+ * @copyright Copyright (C) 2019 Siemens Aktiengesellschaft.\n
+ *            All rights reserved.
+ */
+
+#include "unity.h"
+#include "jwt.h"
+#include "memory.h"
+#include "string_util.h"
+#include "json_util.h"
+#include "time_util.h"
+#include "mcl_core/mcl_log_util.h"
+#include "mock_security_handler.h"
+
+security_handler_t *security_handler = MCL_NULL;
+char *jti = MCL_NULL;
+char *tenant = MCL_NULL;
+char *jti_value = "2b1a7b1a56384e018fee50f02c38366a";
+
+void setUp(void)
+{
+    MCL_NEW(security_handler);
+    security_handler->client_id = string_util_strdup("s6BhdRkqt3");
+    tenant = string_util_strdup("br-smk1");
+
+    jti = string_util_strdup(jti_value);
+    security_handler_generate_jti_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_generate_jti_ReturnThruPtr_jti(&jti);
+}
+
+void tearDown(void)
+{
+    MCL_FREE(tenant);
+    MCL_FREE(security_handler->client_id);
+    MCL_FREE(security_handler);
+}
+
+void _check_json_child_string(mcl_json_t *root, const char *child_name, const char *child_value)
+{
+    mcl_json_t *name = MCL_NULL;
+    char *value = MCL_NULL;
+    mcl_int32_t code = json_util_get_object_item(root, child_name, &name);
+    TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "Child does not exist in root.");
+
+    json_util_get_string(name, &value);
+    TEST_ASSERT_EQUAL_STRING_MESSAGE(child_value, value, "Value of child mismatch.");
+
+    MCL_FREE(value);
+}
+
+/**
+ * GIVEN : MCL_SECURITY_SHARED_SECRET security profile, tenant value and a security handler with client id.
+ * WHEN  : jwt_initialize() is called.
+ * THEN  : JWT is created, its header and payload are correctly set and MCL_OK is returned.
+ */
+void test_initialize_001(void)
+{
+    // Variable declaration.
+    mcl_int32_t code;
+    jwt_t *jwt = MCL_NULL;
+<<<<<<< HEAD
+    json_t *exp = MCL_NULL;
+    json_t *nbf = MCL_NULL;
+    json_t *iat = MCL_NULL;
+    json_t *schema = MCL_NULL;
+    json_t *schema_array = MCL_NULL;
+    char *schema_value = MCL_NULL;
+    char *expected_schema_value = "urn:siemens:mindsphere:v1";
+=======
+    mcl_json_t *exp = MCL_NULL;
+    mcl_json_t *nbf = MCL_NULL;
+    mcl_json_t *iat = MCL_NULL;
+    mcl_json_t *schema = MCL_NULL;
+    mcl_json_t *schema_array = MCL_NULL;
+>>>>>>> dev
+    double exp_value = 0;
+    double nbf_value = 0;
+    double iat_value = 0;
+
+    // Test.
+    code = jwt_initialize(security_handler, MCL_SECURITY_SHARED_SECRET, tenant, &jwt);
+
+    // Check results.
+    TEST_ASSERT_MESSAGE(MCL_OK == code, "jwt_initialize() unexpected return error!");
+    TEST_ASSERT_NOT_NULL(jwt);
+    TEST_ASSERT_EQUAL(security_handler, jwt->security_handler);
+    TEST_ASSERT_EQUAL(MCL_SECURITY_SHARED_SECRET, jwt->security_profile);
+    TEST_ASSERT_NOT_NULL(jwt->header);
+    TEST_ASSERT_NOT_NULL(jwt->payload);
+
+    // Check payload and header fields. 
+    _check_json_child_string(jwt->header, "typ", "JWT");
+    _check_json_child_string(jwt->header, "alg", "HS256");
+    _check_json_child_string(jwt->payload, "iss", security_handler->client_id);
+    _check_json_child_string(jwt->payload, "sub", security_handler->client_id);
+    _check_json_child_string(jwt->payload, "aud", "southgate");
+    _check_json_child_string(jwt->payload, "ten", tenant);
+    _check_json_child_string(jwt->payload, "jti", jti_value);
+
+    code = json_util_get_object_item(jwt->payload, "iat", &iat);
+    TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "<iat> field does not exist in payload.");
+
+    code = json_util_get_object_item(jwt->payload, "nbf", &nbf);
+    TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "<nbf> field does not exist in payload.");
+
+    code = json_util_get_object_item(jwt->payload, "exp", &exp);
+    TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "<exp> field does not exist in payload.");
+
+    json_util_get_double_value(iat, &iat_value);
+    json_util_get_double_value(nbf, &nbf_value);
+    json_util_get_double_value(exp, &exp_value);
+
+    TEST_ASSERT_EQUAL_INT_MESSAGE(iat_value, nbf_value, "Values of <iat> and <nbf> fields are not equal.");
+    TEST_ASSERT_EQUAL_INT_MESSAGE(iat_value + 86400, exp_value, "Value of <exp> is incorrect.");
+
+    code = json_util_get_object_item(jwt->payload, "schemas", &schema_array);
+    TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "<schemas> array does not exist in payload.");
+
+    code = json_util_get_array_item(schema_array, 0, &schema);
+    TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "No schema in <schemas> array.");
+
+    json_util_get_string(schema, &schema_value);
+    TEST_ASSERT_EQUAL_STRING_MESSAGE(expected_schema_value, schema_value, "Value of schema is incorrect.");
+    
+    // Clean up.
+    MCL_FREE(schema_value);
+<<<<<<< HEAD
+    MCL_FREE(iat);
+    MCL_FREE(nbf);
+    MCL_FREE(exp);
+    json_util_destroy(&schema);
+    MCL_FREE(schema_array);
+=======
+
+>>>>>>> dev
+    jwt_destroy(&jwt);
+}
+
+/**
+ * GIVEN : MCL_SECURITY_RSA_3072 security profile, tenant value and a security handler with client id.
+ * WHEN  : jwt_initialize() is called.
+ * THEN  : JWT is created, its header and payload are correctly set and MCL_OK is returned.
+ */
+void test_initialize_002(void)
+{
+    // Variable declaration.
+    mcl_int32_t code;
+    jwt_t *jwt = MCL_NULL;
+<<<<<<< HEAD
+    json_t *exp = MCL_NULL;
+    json_t *nbf = MCL_NULL;
+    json_t *iat = MCL_NULL;
+    json_t *schema = MCL_NULL;
+    json_t *schema_array = MCL_NULL;
+    char *schema_value = MCL_NULL;
+    char *expected_schema_value = "urn:siemens:mindsphere:v1";
+=======
+    mcl_json_t *exp = MCL_NULL;
+    mcl_json_t *nbf = MCL_NULL;
+    mcl_json_t *iat = MCL_NULL;
+    mcl_json_t *schema = MCL_NULL;
+    mcl_json_t *schema_array = MCL_NULL;
+>>>>>>> dev
+    double exp_value = 0;
+    double nbf_value = 0;
+    double iat_value = 0;
+
+    // Test.
+    code = jwt_initialize(security_handler, MCL_SECURITY_RSA_3072, tenant, &jwt);
+
+    // Check results.
+    TEST_ASSERT_MESSAGE(MCL_OK == code, "jwt_initialize() unexpected return error!");
+    TEST_ASSERT_NOT_NULL(jwt);
+    TEST_ASSERT_EQUAL(security_handler, jwt->security_handler);
+    TEST_ASSERT_EQUAL(MCL_SECURITY_RSA_3072, jwt->security_profile);
+    TEST_ASSERT_NOT_NULL(jwt->header);
+    TEST_ASSERT_NOT_NULL(jwt->payload);
+
+    // Check payload and header fields. 
+    _check_json_child_string(jwt->header, "typ", "JWT");
+    _check_json_child_string(jwt->header, "alg", "RS256");
+    _check_json_child_string(jwt->payload, "iss", security_handler->client_id);
+    _check_json_child_string(jwt->payload, "sub", security_handler->client_id);
+    _check_json_child_string(jwt->payload, "aud", "southgate");
+    _check_json_child_string(jwt->payload, "ten", tenant);
+    _check_json_child_string(jwt->payload, "jti", jti_value);
+
+    code = json_util_get_object_item(jwt->payload, "iat", &iat);
+    TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "<iat> field does not exist in payload.");
+
+    code = json_util_get_object_item(jwt->payload, "nbf", &nbf);
+    TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "<nbf> field does not exist in payload.");
+
+    code = json_util_get_object_item(jwt->payload, "exp", &exp);
+    TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "<exp> field does not exist in payload.");
+
+    json_util_get_double_value(iat, &iat_value);
+    json_util_get_double_value(nbf, &nbf_value);
+    json_util_get_double_value(exp, &exp_value);
+
+    TEST_ASSERT_EQUAL_INT_MESSAGE(iat_value, nbf_value, "Values of <iat> and <nbf> fields are not equal.");
+    TEST_ASSERT_EQUAL_INT_MESSAGE(iat_value + 86400, exp_value, "Value of <exp> is incorrect.");
+
+    code = json_util_get_object_item(jwt->payload, "schemas", &schema_array);
+    TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "<schemas> array does not exist in payload.");
+
+    code = json_util_get_array_item(schema_array, 0, &schema);
+    TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "No schema in <schemas> array.");
+
+    json_util_get_string(schema, &schema_value);
+    TEST_ASSERT_EQUAL_STRING_MESSAGE(expected_schema_value, schema_value, "Value of schema is incorrect.");
+
+<<<<<<< HEAD
+    // Clean up.
+    MCL_FREE(schema_value);
+    MCL_FREE(iat);
+    MCL_FREE(nbf);
+    MCL_FREE(exp);
+    json_util_destroy(&schema);
+    MCL_FREE(schema_array);
+=======
+>>>>>>> dev
+    jwt_destroy(&jwt);
+}
+
+/**
+ * GIVEN : Initialized JWT.
+ * WHEN  : jwt_destroy() is called.
+ * THEN  : JWT is destroyed.
+ */
+void test_destroy_001(void)
+{
+    // Variable declaration.
+    jwt_t *jwt = MCL_NULL;
+    mcl_int32_t code;
+
+    // Initialize JWT.
+    code = jwt_initialize(security_handler, MCL_SECURITY_SHARED_SECRET, tenant, &jwt);
+
+    TEST_ASSERT_MESSAGE(MCL_OK == code, "jwt_initialize() unexpected return error!");
+    TEST_ASSERT_NOT_NULL_MESSAGE(jwt, "JWT is NULL after it is initialized.");
+
+    // Test.
+    jwt_destroy(&jwt);
+
+    // Check result.
+    TEST_ASSERT_NULL_MESSAGE(jwt, "JWT is not NULL after it is destroyed.");
+}
+
+/**
+ * GIVEN : Initialized JWT and security profile is shared secret.
+ * WHEN  : jwt_get_token() is called.
+ * THEN  : Token is generated.
+ */
+void test_get_token_001(void)
+{
+    // Variable declaration.
+    mcl_int32_t code;
+    jwt_t *jwt = MCL_NULL;
+    char *token;
+    char *encoded_header = string_util_strdup("Encoded_header");
+    char *encoded_payload = string_util_strdup("Encoded_payload");
+    char *encoded_signature = string_util_strdup("Encoded_signature");
+    char *expected_token = "Encoded_header.Encoded_payload.Encoded_signature";
+
+    // Initialize JWT.
+    code = jwt_initialize(security_handler, MCL_SECURITY_SHARED_SECRET, tenant, &jwt);
+    TEST_ASSERT_MESSAGE(MCL_OK == code, "jwt_initialize() unexpected return error!");
+
+    mcl_size_t raw_signature_size = 20;
+    mcl_uint8_t *raw_signature = MCL_MALLOC(raw_signature_size);
+
+    // Mock security_handler_hmac_sha256() function.
+    security_handler_hmac_sha256_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_hmac_sha256_ReturnThruPtr_hash(&raw_signature);
+    security_handler_hmac_sha256_ReturnThruPtr_hash_size(&raw_signature_size);
+
+    // Mock security_handler_encode_base64_url function for header, payload and signature.
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_base64_url_encode_ReturnThruPtr_encoded_data(&encoded_header);
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_base64_url_encode_ReturnThruPtr_encoded_data(&encoded_payload);
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_base64_url_encode_ReturnThruPtr_encoded_data(&encoded_signature);
+
+    // Test.
+    token = jwt_get_token(jwt);
+
+    // Check results.
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_STRING_MESSAGE(expected_token, token, "Token is not generated as expected!");
+
+    // Clean up.
+    MCL_FREE(token);
+    jwt_destroy(&jwt);
+}
+
+/**
+ * GIVEN : Initialized JWT and encoding header in base64 URL format is failed.
+ * WHEN  : jwt_get_token() is called.
+ * THEN  : Token is not generated.
+ */
+void test_get_token_002(void)
+{
+    // Variable declaration.
+    mcl_int32_t code;
+    jwt_t *jwt = MCL_NULL;
+    char *token;
+
+    // Initialize JWT.
+    code = jwt_initialize(security_handler, MCL_SECURITY_SHARED_SECRET, tenant, &jwt);
+    TEST_ASSERT_MESSAGE(MCL_OK == code, "jwt_initialize() unexpected return error!");
+
+    // Mock security_handler_base64_url_encode() function for header.
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_FAIL);
+
+    // Test.
+    token = jwt_get_token(jwt);
+
+    // Check result.
+    TEST_ASSERT_NULL(token);
+
+    // Clean up.
+    jwt_destroy(&jwt);
+}
+
+/**
+ * GIVEN : Initialized JWT and encoding payload in base64 URL format is failed.
+ * WHEN  : jwt_get_token() is called.
+ * THEN  : Token is not generated.
+ */
+void test_get_token_003(void)
+{
+    // Variable declaration.
+    mcl_int32_t code;
+    jwt_t *jwt = MCL_NULL;
+    char *encoded_header = string_util_strdup("encoded_header");
+    char *token;
+
+    // Initialize JWT.
+    code = jwt_initialize(security_handler, MCL_SECURITY_SHARED_SECRET, tenant, &jwt);
+    TEST_ASSERT_MESSAGE(MCL_OK == code, "jwt_initialize() unexpected return error!");
+
+    // Mock security_handler_encode_base64_url function for header and payload.
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_base64_url_encode_ReturnThruPtr_encoded_data(&encoded_header);
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_FAIL);
+
+    // Test.
+    token = jwt_get_token(jwt);
+
+    // Check result.
+    TEST_ASSERT_NULL(token);
+
+    // Clean up.
+    jwt_destroy(&jwt);
+}
+
+/**
+ * GIVEN : Initialized JWT and calculating hmac sha256 of header and payload is failed.
+ * WHEN  : jwt_get_token() is called.
+ * THEN  : Token is not generated.
+ */
+void test_get_token_004(void)
+{
+    // Variable declaration.
+    mcl_int32_t code;
+    jwt_t *jwt = MCL_NULL;
+    char *encoded_header = string_util_strdup("encoded_header");
+    char *encoded_payload = string_util_strdup("encoded_payload");
+    char *token;
+
+    // Initialize JWT.
+    code = jwt_initialize(security_handler, MCL_SECURITY_SHARED_SECRET, tenant, &jwt);
+    TEST_ASSERT_MESSAGE(MCL_OK == code, "jwt_initialize() unexpected return error!");
+
+    // Mock security_handler_encode_base64_url function for header and payload.
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_base64_url_encode_ReturnThruPtr_encoded_data(&encoded_header);
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_base64_url_encode_ReturnThruPtr_encoded_data(&encoded_payload);
+
+    // Mock security_handler_hmac_sha256() function.
+    security_handler_hmac_sha256_ExpectAnyArgsAndReturn(MCL_FAIL);
+
+    // Test.
+    token = jwt_get_token(jwt);
+
+    // Check result.
+    TEST_ASSERT_NULL(token);
+
+    // Clean up.
+    jwt_destroy(&jwt);
+}
+
+/**
+ * GIVEN : Initialized JWT and encoding signature in base64 URL format is failed.
+ * WHEN  : jwt_get_token() is called.
+ * THEN  : Token is not generated.
+ */
+void test_get_token_005(void)
+{
+    // Variable declaration.
+    mcl_int32_t code;
+    jwt_t *jwt = MCL_NULL;
+    char *encoded_header = string_util_strdup("encoded_header");
+    char *encoded_payload = string_util_strdup("encoded_payload");
+    mcl_size_t raw_signature_size = 20;
+    mcl_uint8_t *raw_signature = MCL_MALLOC(raw_signature_size);
+    char *token;
+
+    // Initialize JWT.
+    code = jwt_initialize(security_handler, MCL_SECURITY_SHARED_SECRET, tenant, &jwt);
+    TEST_ASSERT_MESSAGE(MCL_OK == code, "jwt_initialize() unexpected return error!");
+
+    // Mock security_handler_hmac_sha256() function.
+    security_handler_hmac_sha256_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_hmac_sha256_ReturnThruPtr_hash(&raw_signature);
+    security_handler_hmac_sha256_ReturnThruPtr_hash_size(&raw_signature_size);
+
+    // Mock security_handler_encode_base64_url function for header, payload and signature.
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_base64_url_encode_ReturnThruPtr_encoded_data(&encoded_header);
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_base64_url_encode_ReturnThruPtr_encoded_data(&encoded_payload);
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_FAIL);
+
+    // Test.
+    token = jwt_get_token(jwt);
+
+    // Check result.
+    TEST_ASSERT_NULL(token);
+
+    // Clean up.
+    jwt_destroy(&jwt);
+}
+
+/**
+ * GIVEN : Initialized JWT and security profile is RSA.
+ * WHEN  : jwt_get_token() is called.
+ * THEN  : Token is generated.
+ */
+void test_get_token_006(void)
+{
+    // Variable declaration.
+    mcl_int32_t code;
+    jwt_t *jwt = MCL_NULL;
+    char *token;
+    char *encoded_header = string_util_strdup("Encoded_header");
+    char *encoded_payload = string_util_strdup("Encoded_payload");
+    char *encoded_signature = string_util_strdup("Encoded_signature");
+    char *expected_token = "Encoded_header.Encoded_payload.Encoded_signature";
+
+    // Initialize JWT.
+    code = jwt_initialize(security_handler, MCL_SECURITY_RSA_3072, tenant, &jwt);
+    TEST_ASSERT_MESSAGE(MCL_OK == code, "jwt_initialize() unexpected return error!");
+
+    // No need to fill raw string since base64 mock will return indepentendly the expected result. Just allocate a memory in order to release it later.
+    mcl_size_t raw_signature_size = 20;
+    mcl_uint8_t *raw_signature = MCL_MALLOC(raw_signature_size);
+
+    // Mock security_handler_rsa_sign() function.
+    security_handler_rsa_sign_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_rsa_sign_ReturnThruPtr_signature(&raw_signature);
+    security_handler_rsa_sign_ReturnThruPtr_signature_size(&raw_signature_size);
+
+    // Mock security_handler_encode_base64_url function for header, payload and signature.
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_base64_url_encode_ReturnThruPtr_encoded_data(&encoded_header);
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_base64_url_encode_ReturnThruPtr_encoded_data(&encoded_payload);
+    security_handler_base64_url_encode_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_base64_url_encode_ReturnThruPtr_encoded_data(&encoded_signature);
+
+    // Test.
+    token = jwt_get_token(jwt);
+
+    // Check results.
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_STRING_MESSAGE(expected_token, token, "Token is not generated as expected!");
+
+    // Clean up.
+    MCL_FREE(token);
+    jwt_destroy(&jwt);
+}

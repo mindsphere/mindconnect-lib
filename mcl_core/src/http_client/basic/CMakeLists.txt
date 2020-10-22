@@ -1,0 +1,1 @@
+MESSAGE(FATAL_ERROR "MCL implementation can only be used with tls socket implementation.")
