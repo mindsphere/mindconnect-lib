@@ -25,7 +25,7 @@ static const char transfer_encoding_header[] = "Transfer-Encoding: chunked";
 
 #define TLS_DEFAULT_PORT 443
 #define HTTP_CALLBACK_BUFFER_SIZE 1024
-#define HTTP_PARSE_BUFFER_SIZE 1024
+#define HTTP_PARSE_BUFFER_SIZE 2048
 #define SIZE_OF_STRING(x) (sizeof(x) - MCL_NULL_CHAR_SIZE)
 
 #define TO_STRING_HELPER(x) (#x)

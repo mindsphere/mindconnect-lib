@@ -8,18 +8,24 @@
 
 #include "file_util.h"
 #include "mcl_core/mcl_assert.h"
+#include <stdio.h>
+
+#if HAVE_FILE_SYSTEM_
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <stdio.h>
+
+static mcl_error_t _file_util_fstat(void *file_descriptor, struct stat *file_attributes);
+#else
+static const char mcl_no_file_system_message[] = "MCL file utility cannot be used.";
+#endif
 
 #if !defined(S_ISREG) && defined(S_IFMT) && defined(S_IFREG)
 #define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
 #endif
 
-static mcl_error_t _file_util_fstat(void *file_descriptor, struct stat *file_attributes);
-
 mcl_error_t mcl_file_util_fopen(const char *file_name, const char *mode, void **file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     mcl_error_t return_code;
 
     MCL_DEBUG_ENTRY("const char *file_name = <%s>, const char *mode = <%s>, void **file_descriptor = <%p>", file_name, mode, file_descriptor);
@@ -28,12 +34,16 @@ mcl_error_t mcl_file_util_fopen(const char *file_name, const char *mode, void **
 
     MCL_DEBUG_LEAVE("retVal = <%d>", return_code);
     return return_code;
+#else
+    MCL_ERROR_STRING(mcl_no_file_system_message);
+    return MCL_FAIL;
+#endif
 }
 
 mcl_error_t mcl_file_util_fopen_without_log(const char *file_name, const char *mode, void **file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     mcl_error_t return_code = MCL_OK;
-
     FILE *file;
 
 #if defined(WIN32) || defined(WIN64)
@@ -47,11 +57,15 @@ mcl_error_t mcl_file_util_fopen_without_log(const char *file_name, const char *m
         return_code = MCL_FAIL;
     }
 
-    return return_code;
+    return return_code; 
+#else
+    return MCL_FAIL;
+#endif
 }
 
 mcl_error_t mcl_file_util_fclose(void *file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     mcl_error_t return_code;
 
     MCL_DEBUG_ENTRY("void *file_descriptor = <%p>", file_descriptor);
@@ -60,10 +74,15 @@ mcl_error_t mcl_file_util_fclose(void *file_descriptor)
 
     MCL_DEBUG_LEAVE("retVal = <%d>", return_code);
     return return_code;
+#else
+    MCL_ERROR_STRING(mcl_no_file_system_message);
+    return MCL_FAIL;
+#endif
 }
 
 mcl_error_t mcl_file_util_fclose_without_log(void *file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     mcl_error_t return_code = MCL_OK;
 
     if (MCL_NULL != file_descriptor)
@@ -76,10 +95,14 @@ mcl_error_t mcl_file_util_fclose_without_log(void *file_descriptor)
     }
 
     return return_code;
+#else
+    return MCL_FAIL;
+#endif
 }
 
 mcl_error_t mcl_file_util_fwrite(const void *data, mcl_size_t size, mcl_size_t count, void *file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     mcl_error_t return_code;
 
     MCL_DEBUG_ENTRY("const void *data = <%p>, mcl_size_t size = <%u>, mcl_size_t count = <%u>, void *file_descriptor = <%p>", data, size, count, file_descriptor);
@@ -88,10 +111,15 @@ mcl_error_t mcl_file_util_fwrite(const void *data, mcl_size_t size, mcl_size_t c
 
     MCL_DEBUG_LEAVE("retVal = <%d>", return_code);
     return return_code;
+#else
+    MCL_ERROR_STRING(mcl_no_file_system_message);
+    return MCL_FAIL;
+#endif
 }
 
 mcl_error_t mcl_file_util_fwrite_without_log(const void *data, mcl_size_t size, mcl_size_t count, void *file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     mcl_error_t return_code = MCL_FAIL;
 
     mcl_size_t actual_count = fwrite(data, size, count, (FILE *)file_descriptor);
@@ -105,20 +133,28 @@ mcl_error_t mcl_file_util_fwrite_without_log(const void *data, mcl_size_t size, 
     }
 
     return return_code;
+#else
+    return MCL_FAIL;
+#endif
 }
 
 void mcl_file_util_fread(void *data, mcl_size_t size, mcl_size_t count, void *file_descriptor, mcl_size_t *actual_count)
 {
+#if HAVE_FILE_SYSTEM_
     MCL_DEBUG_ENTRY("void *data = <%p>, mcl_size_t size = <%u>, mcl_size_t count = <%u>, void *file_descriptor = <%p>, mcl_size_t *actual_count = <%p>", data, size, count,
                 file_descriptor, actual_count);
 
     *actual_count = fread(data, size, count, (FILE *)file_descriptor);
 
     MCL_DEBUG_LEAVE("retVal = void");
+#else
+    MCL_ERROR_STRING(mcl_no_file_system_message);
+#endif
 }
 
 mcl_error_t mcl_file_util_fputs(const char *data, void *file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     mcl_error_t return_code = MCL_FAIL;
     mcl_error_t result;
 
@@ -136,10 +172,15 @@ mcl_error_t mcl_file_util_fputs(const char *data, void *file_descriptor)
 
     MCL_DEBUG_LEAVE("retVal = <%d>", return_code);
     return return_code;
+#else
+    MCL_ERROR_STRING(mcl_no_file_system_message);
+    return MCL_FAIL;
+#endif
 }
 
 mcl_error_t mcl_file_util_fgets(char *data, mcl_size_t data_size, void *file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     mcl_error_t return_code = MCL_FAIL;
     char *output;
 
@@ -157,10 +198,15 @@ mcl_error_t mcl_file_util_fgets(char *data, mcl_size_t data_size, void *file_des
 
     MCL_DEBUG_LEAVE("retVal = <%d>", return_code);
     return return_code;
+#else
+    MCL_ERROR_STRING(mcl_no_file_system_message);
+    return MCL_FAIL;
+#endif
 }
 
 mcl_error_t mcl_file_util_fflush(void *file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     mcl_error_t return_code;
 
     MCL_DEBUG_ENTRY("void *file_descriptor = <%p>", file_descriptor);
@@ -169,18 +215,19 @@ mcl_error_t mcl_file_util_fflush(void *file_descriptor)
 
     MCL_DEBUG_LEAVE("retVal = <%d>", return_code);
     return return_code;
+#else
+    MCL_ERROR_STRING(mcl_no_file_system_message);
+    return MCL_FAIL;
+#endif
 }
 
 mcl_error_t mcl_file_util_fflush_without_log(void *file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     mcl_error_t return_code = MCL_FAIL;
     int result;
 
-#if defined(WIN32) || defined(WIN64)
     result = fflush((FILE *)file_descriptor);
-#else
-    result = fflush((FILE *)file_descriptor);
-#endif
 
     if (0 == result)
     {
@@ -192,10 +239,15 @@ mcl_error_t mcl_file_util_fflush_without_log(void *file_descriptor)
     }
 
     return return_code;
+#else
+    MCL_ERROR_STRING(mcl_no_file_system_message);
+    return MCL_FAIL;
+#endif
 }
 
 void mcl_file_util_rewind(void *file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     MCL_DEBUG_ENTRY("void *file_descriptor = <%p>", file_descriptor);
 
     if (MCL_NULL != file_descriptor)
@@ -204,10 +256,14 @@ void mcl_file_util_rewind(void *file_descriptor)
     }
 
     MCL_DEBUG_LEAVE("retVal = void");
+#else
+    MCL_ERROR_STRING(mcl_no_file_system_message);
+#endif
 }
 
 mcl_bool_t mcl_file_util_check_if_regular_file(void *file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     mcl_bool_t is_regular_file = MCL_FALSE;
     struct stat file_attributes;
 
@@ -222,10 +278,15 @@ mcl_bool_t mcl_file_util_check_if_regular_file(void *file_descriptor)
 
     MCL_DEBUG_LEAVE("retVal = <%d>", is_regular_file);
     return is_regular_file;
+#else
+    MCL_ERROR_STRING(mcl_no_file_system_message);
+    return MCL_FALSE;
+#endif
 }
 
 mcl_size_t mcl_file_util_get_file_size(void *file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     struct stat file_attributes;
     mcl_size_t file_size = 0;
 
@@ -238,10 +299,15 @@ mcl_size_t mcl_file_util_get_file_size(void *file_descriptor)
 
     MCL_DEBUG_LEAVE("retVal = <%u>", file_size);
     return file_size;
+#else
+    MCL_ERROR_STRING(mcl_no_file_system_message);
+    return 0;
+#endif
 }
 
 mcl_time_t mcl_file_util_get_time_of_last_status_change(void *file_descriptor)
 {
+#if HAVE_FILE_SYSTEM_
     struct stat file_attributes;
     mcl_time_t time = 0;
 
@@ -254,8 +320,13 @@ mcl_time_t mcl_file_util_get_time_of_last_status_change(void *file_descriptor)
 
     MCL_DEBUG_LEAVE("retVal = <%u>", time);
     return time;
+#else
+    MCL_ERROR_STRING(mcl_no_file_system_message);
+    return 0;
+#endif
 }
 
+#if HAVE_FILE_SYSTEM_
 static mcl_error_t _file_util_fstat(void *file_descriptor, struct stat *file_attributes)
 {
     mcl_error_t return_code = MCL_FAIL;
@@ -281,3 +352,4 @@ static mcl_error_t _file_util_fstat(void *file_descriptor, struct stat *file_att
     MCL_DEBUG_LEAVE("retVal = <%d>", return_code);
     return return_code;
 }
+#endif
