@@ -11,7 +11,8 @@
 #include "mcl_core/mcl_string_util.h"
 #include "mbedtls/ssl.h"
 #include "mbedtls/entropy.h"
-#include "features/netsocket/TLSSocket.h"
+#include <TLSSocket.h>
+#include <SocketAddress.h>
 
 typedef struct mcl_tls_socket_t
 {
@@ -158,19 +159,16 @@ MCL_FUNCTION_LEAVE_LABEL:
 extern "C" mcl_error_t mcl_tls_socket_open(mcl_tls_socket_handle tls_socket_handle)
 {
     mcl_error_t code = MCL_FAIL;
-    NetworkInterface *interface;
 
     MCL_DEBUG_ENTRY("mcl_tls_socket_handle tls_socket_handle = <%p>", tls_socket_handle);
 
     MCL_ASSERT_NOT_NULL(tls_socket_handle, code);
 
-    interface = mcl_network_interface;
-
-    if (nullptr == interface)
+    if (nullptr == mcl_network_interface)
     {
         MCL_FATAL_STRING("Network interface is NULL.");
     }
-    else if (NSAPI_ERROR_OK == tls_socket_handle->socket.open(interface))
+    else if (NSAPI_ERROR_OK == tls_socket_handle->socket.open(mcl_network_interface))
     {
         code = MCL_OK;
     }
@@ -193,15 +191,30 @@ extern "C" mcl_error_t mcl_tls_socket_connect(mcl_tls_socket_handle tls_socket_h
     }
     else
     {
-        nsapi_code = tls_socket_handle->socket.connect(host, port);
+        SocketAddress address;
         
-        if (NSAPI_ERROR_OK == nsapi_code)
+        nsapi_code = mcl_network_interface->gethostbyname(host, &address);
+    
+        if (nsapi_code != NSAPI_ERROR_OK)
         {
-            code = MCL_OK;
+            MCL_ERROR("Cannot resolve DNS, gethostbyname returned: %d", nsapi_code);
+            code = MCL_COULD_NOT_RESOLVE_HOST;
         }
         else
         {
-             MCL_ERROR("Mbed TLS Socket returned %d.", nsapi_code);
+            address.set_port(port);
+            tls_socket_handle->socket.set_hostname(host);
+            
+            nsapi_code = tls_socket_handle->socket.connect(address);
+        
+            if (NSAPI_ERROR_OK == nsapi_code)
+            {
+                code = MCL_OK;
+            }
+            else
+            {
+                 MCL_ERROR("Mbed TLS Socket returned %d.", nsapi_code);
+            }
         }
     }
 
