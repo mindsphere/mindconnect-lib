@@ -1,3 +1,9 @@
+# [4.2.4] (2020-11-28)
+
+## Features
+
+* MCL is ported to be used by mbedOS applications.
+
 # [4.2.3] (2020-10-10)
 
 ## Bug Fixes

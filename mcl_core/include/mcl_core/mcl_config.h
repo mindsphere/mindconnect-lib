@@ -22,7 +22,11 @@
  * It can be overridden by a global preprocessor definition as it is when building with CMake.
  */
 #ifndef HAVE_FILE_SYSTEM_
+#ifdef __MBED__
+#define HAVE_FILE_SYSTEM_ 0
+#else
 #define HAVE_FILE_SYSTEM_ 1
+#endif
 #endif
 
  /**

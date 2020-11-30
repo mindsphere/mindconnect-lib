@@ -1,0 +1,6 @@
+doc/*
+examples/*
+test/*
+src/crypto/openssl/*
+src/http_client/curl/*
+src/http_client/basic/mbedtls*

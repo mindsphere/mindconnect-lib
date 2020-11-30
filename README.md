@@ -363,6 +363,11 @@ $ cmake --build . --clean-first
 
 You will find agent application executable named **\<CustomAgentApplication\>** in **\<Custom_Agent_Build_Directory>\**.
 
+### Building MCL In Specific Environments
+Although the default build tool is CMake, MCL is ported to be built as part of other SDK in specific environments. You can build MCL as part of an mbedOS application by 
+importing MCL as a library to your application in mbedOS development environment. You can integrate MCL to Sony Spresense environment to be built together 
+with Sony Spresense SDK by following the document <a href = "./SonySpresenseGuide.md" target="_blank"><u>Sony Spresense Guide</u></a> provided with MCL source code.
+
 ## Accessing Reference Documentation
 You can access reference documentation online from https://developer.mindsphere.io/resources/mindconnect-lib-v4/doxygen/html/index.html.
 Alternatively, you can generate a local copy of the reference documentation using Doxygen.
