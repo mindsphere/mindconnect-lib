@@ -78,7 +78,7 @@ mcl_error_t mcl_list_next(mcl_list_t *list, mcl_list_node_t **node)
     mcl_error_t code = MCL_OK;
 
     MCL_DEBUG_ENTRY("mcl_list_t *list = <%p>, mcl_list_node_t **node = <%p>", list, node);
-    
+
     // Null check for node.
     MCL_ASSERT_NOT_NULL(node, code);
     *node = MCL_NULL;
@@ -180,14 +180,12 @@ mcl_error_t mcl_list_remove(mcl_list_t *list, mcl_list_node_t *node)
     // List handling.
     if (list->head == node)
     {
-        // If this was the head node, take the head to the next one. If the next one is MCL_NULL then list->head will also be MCL_NULL. No need to check for MCL_NULL.
         list->head = node->next;
         MCL_VERBOSE("This is the head node. Head pointer updated to the next node");
     }
 
     if (list->last == node)
     {
-        // If this is the last node take the last node to the previous one. If the prev one is MCL_NULL then list->prev will also be MCL_NULL. No need to check for MCL_NULL.
         list->last = node->prev;
         MCL_VERBOSE("This is the last node. Last pointer updated to the previous node");
     }
@@ -243,7 +241,8 @@ mcl_error_t mcl_list_exist(mcl_list_t *list, const void *item_to_find, mcl_list_
     mcl_list_node_t *current_node;
     mcl_error_t code = MCL_FAIL;
 
-    MCL_DEBUG_ENTRY("mcl_list_t *list = <%p>, const void *item_to_find = <%p>, mcl_list_compare_callback compare_function = <%p>, void **item = <%p>", list, item_to_find, compare_function, item);
+    MCL_DEBUG_ENTRY("mcl_list_t *list = <%p>, const void *item_to_find = <%p>, mcl_list_compare_callback compare_function = <%p>, void **item = <%p>",
+        list, item_to_find, compare_function, item);
 
     MCL_ASSERT_NOT_NULL(list, code);
     MCL_ASSERT_NOT_NULL(item_to_find, code);

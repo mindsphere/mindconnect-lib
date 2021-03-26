@@ -59,7 +59,8 @@ mcl_error_t mcl_core_configuration_set_parameter(mcl_core_configuration_t *confi
     mcl_error_t code = MCL_OK;
     mcl_size_t user_agent_length = 0;
 
-    MCL_DEBUG_ENTRY("mcl_core_configuration_t *configuration = <%p>, E_MCL_CORE_CONFIGURATION_PARAMETER parameter = <%d>, const void *value = <%p>", configuration, parameter, value);
+    MCL_DEBUG_ENTRY("mcl_core_configuration_t *configuration = <%p>, E_MCL_CORE_CONFIGURATION_PARAMETER parameter = <%d>, const void *value = <%p>",
+        configuration, parameter, value);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(configuration, code);
@@ -93,7 +94,8 @@ mcl_error_t mcl_core_configuration_set_parameter(mcl_core_configuration_t *confi
         case MCL_CORE_CONFIGURATION_PARAMETER_PROXY_TYPE:
 
             // Validate proxy type.
-            MCL_ASSERT_CODE_MESSAGE(MCL_PROXY_HTTP <= *(E_MCL_PROXY *) value && MCL_PROXY_END > *(E_MCL_PROXY *) value, MCL_INVALID_PARAMETER, "Invalid proxy type value.");
+            MCL_ASSERT_CODE_MESSAGE(MCL_PROXY_HTTP <= *(E_MCL_PROXY *) value && MCL_PROXY_END > *(E_MCL_PROXY *) value, MCL_INVALID_PARAMETER,
+                "Invalid proxy type value.");
             configuration->proxy_type = *(E_MCL_PROXY *) value;
             break;
 
@@ -120,7 +122,8 @@ mcl_error_t mcl_core_configuration_set_parameter(mcl_core_configuration_t *confi
         case MCL_CORE_CONFIGURATION_PARAMETER_SECURITY_PROFILE:
 
             // Validate security profile.
-            MCL_ASSERT_CODE_MESSAGE(MCL_SECURITY_SHARED_SECRET <= *(E_MCL_SECURITY_PROFILE *) value && MCL_SECURITY_PROFILE_END > *(E_MCL_SECURITY_PROFILE *) value, MCL_INVALID_PARAMETER, "Invalid security profile value.");
+            MCL_ASSERT_CODE_MESSAGE(MCL_SECURITY_SHARED_SECRET <= *(E_MCL_SECURITY_PROFILE *) value &&
+                MCL_SECURITY_PROFILE_END > *(E_MCL_SECURITY_PROFILE *) value, MCL_INVALID_PARAMETER, "Invalid security profile value.");
             configuration->security_profile = *(E_MCL_SECURITY_PROFILE *) value;
             break;
 

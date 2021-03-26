@@ -21,6 +21,9 @@ Agents will be able to upload unstructured data to MindSphere Data Lake with **D
 which is also an extension to **Core** component and it is independent of the **Connectivity** component. 
 Including **mcl_data_lake.h** in agent source code will enable all data lake component functionality together with core component functionality.
 
+Agents will be able to get and update any workflows assigned to them with **Deployment** component of MCL, an extension to **Core** component. 
+Including **mcl_deployment.h** in agent source code will enable all deployment component functionality together with core component functionality.
+
 MCL build process will generate separate output binaries for each component. 
 Agents willing to exploit only the core functionality can do so by building and including only the core component. 
 Agents willing to exploit any extension component functionality can do so by building and including that extension component together with 
@@ -294,7 +297,8 @@ $ cmake -DCMAKE_PREFIX_PATH="<OpenSSL_Install_Directory>;<libcurl_Install_Direct
 $ cmake --build . --clean-first --target install
 ```
 
-Now, there must be folders named **mcl_core** and **mcl_connectivity** containing MCL headers in **\<MCL_Install_Directory\>/include** and shared objects named **libmcl_core.so** and **libmcl_connectivity.so** in **\<MCL_Install_Directory\>/lib**.
+Now, there must be folders named **mcl_core**, **mcl_connectivity**, **mcl_data_lake** and **mcl_deployment** containing MCL headers in **\<MCL_Install_Directory\>/include** 
+and shared objects named **libmcl_core.so**, **libmcl_connectivity.so**, **libmcl_data_lake.so** and **libmcl_deployment.so** in **\<MCL_Install_Directory\>/lib**.
 
 #### MCL Build Options
 You can build MCL with different configurations with the options listed in the table below:
@@ -306,6 +310,7 @@ MCL_DOC | OFF | If set to ON, MCL reference documentation is also built.
 MCL_TEST | OFF | If set to ON and if ruby is found in path MCL is built with tests.
 MCL_CONNECTIVITY | ON | If set to ON, MCL Connectivity component will also be built.
 MCL_DATA_LAKE | ON | If set to ON, MCL Data Lake component will also be built.
+MCL_DEPLOYMENT | ON | If set to ON, MCL Deployment component will also be built.
 MCL_CRYPTO | "openssl" | See "Replacing MCL Modules" section.
 MCL_HTTP_CLIENT | "curl" | See "Replacing MCL Modules" section.
 MCL_FILE_UTIL | "standard" | See "Replacing MCL Modules" section.
@@ -396,8 +401,6 @@ data point mapping details.
 Agents have the option to exchange each data item a a single or they have the option to exchange multiple data items 
 independent of their types together in a store (**mcl_store_t). See **mcl_store.h** for details.
 
-Most of the functions in MCL return a status code (E_MCL_CORE_RETURN_CODE, E_MCL_CONNECTIVITY_RETURN_CODE) defined in **mcl_core_common.h** and **mcl_connectivity_common.h**.
-
 ## Examples
 You can find agent application examples using MCL in **/examples** folder of each component of MCL distribution.
 
@@ -434,6 +437,10 @@ Check <MCL_Source_Directory>/mcl_connectivity/examples/event_upload.c file for t
 ### Example : Data Lake Object Upload
 This example agent uploads an object to MindSphere Data Lake.
 Check <MCL_Source_Directory>/mcl_data_lake/examples/data_lake_upload.c file for the implementation.
+
+### Example : Deployment Workflow
+This example agent gets and updates deployment workflow assigned to it.
+Check <MCL_Source_Directory>/mcl_deployment/examples/manage_deployment.c file for the implementation.
 
 ## Licensing
 Please see the files called LICENSE.md and ReadMe_OSS.htm.

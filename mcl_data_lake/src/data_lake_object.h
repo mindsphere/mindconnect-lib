@@ -45,7 +45,8 @@ typedef enum E_DATA_LAKE_OBJECT_INTERNAL_PARAMETER
  * <li>#MCL_INVALID_PARAMETER if provided @p parameter is invalid.</li>
  * </ul>
  */
-MCL_LOCAL mcl_error_t data_lake_object_set_internal_parameter(mcl_data_lake_object_t *object, E_DATA_LAKE_OBJECT_INTERNAL_PARAMETER parameter, const void *value);
+MCL_LOCAL mcl_error_t data_lake_object_set_internal_parameter(mcl_data_lake_object_t *object,
+    E_DATA_LAKE_OBJECT_INTERNAL_PARAMETER parameter, const void *value);
 
 /**
  * This function checks whether all mandatory parameters of a data lake object are set or not.

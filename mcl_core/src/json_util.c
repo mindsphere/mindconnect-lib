@@ -15,6 +15,9 @@
 
 static cJSON_Hooks cjson_hooks;
 
+// Integers and doubles are both treated as numbers in cJSON.
+static mcl_error_t _add_number(mcl_json_t *root, const char *object_name, const double number);
+
 void mcl_json_util_library_initialize(void)
 {
     MCL_DEBUG_ENTRY("void");
@@ -153,7 +156,7 @@ mcl_error_t json_util_get_array_item(mcl_json_t *array, int index, mcl_json_t **
 
     MCL_VERBOSE_ENTRY("mcl_json_t *array = <%p>, int index = <%d>, mcl_json_t **item = <%p>", array, index, item);
 
-    if (cJSON_Array == ((cJSON *) array)->type) 
+    if (cJSON_Array == ((cJSON *) array)->type)
     {
         (*item) = cJSON_GetArrayItem((cJSON *) array, index);
         if (MCL_NULL != *item)
@@ -332,46 +335,11 @@ MCL_FUNCTION_LEAVE_LABEL:
 
 mcl_error_t json_util_add_uint(mcl_json_t *root, const char *object_name, const mcl_size_t number)
 {
-    mcl_error_t code = MCL_OK;
+    mcl_error_t code;
 
     MCL_VERBOSE_ENTRY("mcl_json_t *root = <%p>, char *object_name = <%p>, mcl_size_t number = <%u>", root, object_name, number);
 
-    // Check type of root.
-    if ((cJSON_Array == ((cJSON *) root)->type) && (MCL_NULL == object_name))
-    {
-        // Add uint to array. This function expects a double and type cast to integer inside the function.
-        cJSON *json_number = cJSON_CreateNumber((double) number);
-
-        if (MCL_NULL == json_number)
-        {
-            code = MCL_OUT_OF_MEMORY;
-        }
-        else
-        {
-            cJSON_AddItemToArray((cJSON *) root, json_number);
-        }
-    }
-    else if ((cJSON_Object == ((cJSON *) root)->type) && (MCL_NULL != object_name))
-    {
-        // Get object to add number.
-        mcl_json_t *json_child = MCL_NULL;
-        code = json_util_get_object_item(root, object_name, &json_child);
-
-        if (MCL_JSON_NON_EXISTING_CHILD == code)
-        {
-            // Add uint to object. This function expects a double and type cast to integer inside the function.
-            cJSON_AddNumberToObject((cJSON *) root, object_name, (double)number);
-            code = MCL_OK;
-        }
-        else
-        {
-            code = MCL_JSON_NAME_DUPLICATION;
-        }
-    }
-    else
-    {
-        code = MCL_INVALID_PARAMETER;
-    }
+    code = _add_number(root, object_name, (double) number);
 
     MCL_VERBOSE_LEAVE("retVal = <%d>", code);
     return code;
@@ -395,46 +363,11 @@ MCL_FUNCTION_LEAVE_LABEL:
 
 mcl_error_t json_util_add_double(mcl_json_t *root, const char *object_name, const double number)
 {
-    mcl_error_t code = MCL_OK;
+    mcl_error_t code;
 
     MCL_VERBOSE_ENTRY("mcl_json_t *root = <%p>, const char *object_name = <%p>, const double number = <%f>", root, object_name, number);
 
-    // Check type of root.
-    if ((cJSON_Array == ((cJSON *) root)->type) && (MCL_NULL == object_name))
-    {
-        // Add double to array.
-        cJSON *json_number = cJSON_CreateNumber(number);
-
-        if (MCL_NULL == json_number)
-        {
-            code = MCL_OUT_OF_MEMORY;
-        }
-        else
-        {
-            cJSON_AddItemToArray((cJSON *) root, json_number);
-        }
-    }
-    else if ((cJSON_Object == ((cJSON *) root)->type) && (MCL_NULL != object_name))
-    {
-        // Get object to add double.
-        mcl_json_t *json_child = MCL_NULL;
-        code = json_util_get_object_item(root, object_name, &json_child);
-
-        if (MCL_JSON_NON_EXISTING_CHILD == code)
-        {
-            // Add uint to object. This function expects a double and type cast to integer inside the function.
-            cJSON_AddNumberToObject((cJSON *) root, object_name, (double) number);
-            code = MCL_OK;
-        }
-        else
-        {
-            code = MCL_JSON_NAME_DUPLICATION;
-        }
-    }
-    else
-    {
-        code = MCL_INVALID_PARAMETER;
-    }
+    code = _add_number(root, object_name, number);
 
     MCL_VERBOSE_LEAVE("retVal = <%d>", code);
     return code;
@@ -720,12 +653,12 @@ mcl_error_t json_util_get_number_value(mcl_json_t *json, mcl_int32_t *number_val
 
     MCL_VERBOSE_ENTRY("mcl_json_t *json = <%p>, mcl_int32_t *number_value = <%p>", json, number_value);
 
-    if (cJSON_Number == ((cJSON *) json)->type) 
+    if (cJSON_Number == ((cJSON *) json)->type)
     {
         *number_value = ((cJSON *) json)->valueint;
         code = MCL_OK;
     }
-    
+
     MCL_VERBOSE_LEAVE("retVal = <%d>", code);
     return code;
 }
@@ -821,11 +754,11 @@ MCL_FUNCTION_LEAVE_LABEL:
 mcl_error_t json_util_get_string(mcl_json_t *json, char **string_value)
 {
     mcl_size_t string_length;
-    mcl_error_t code = MCL_JSON_TYPE_MISMATCH;
+    mcl_error_t code;
 
     MCL_VERBOSE_ENTRY("mcl_json_t *json = <%p>, char **string_value = <%p>", json, string_value);
 
-    if (cJSON_String == ((cJSON *) json)->type) 
+    if (cJSON_String == ((cJSON *) json)->type)
     {
         // Calculate string length.
         string_length = string_util_strlen(((cJSON *) json)->valuestring);
@@ -841,6 +774,15 @@ mcl_error_t json_util_get_string(mcl_json_t *json, char **string_value)
             string_util_memcpy(*string_value, ((cJSON *) json)->valuestring, string_length + MCL_NULL_CHAR_SIZE);
             code = MCL_OK;
         }
+    }
+    else if (cJSON_NULL == ((cJSON *) json)->type)
+    {
+        *string_value = MCL_NULL;
+        code = MCL_OK;
+    }
+    else
+    {
+        code = MCL_JSON_TYPE_MISMATCH;
     }
 
     MCL_VERBOSE_LEAVE("retVal = <%d>", code);
@@ -979,4 +921,48 @@ void json_util_destroy(mcl_json_t **root)
     }
 
     MCL_VERBOSE_LEAVE("retVal = void");
+}
+
+static mcl_error_t _add_number(mcl_json_t *root, const char *object_name, const double number)
+{
+    mcl_error_t code = MCL_OK;
+
+    MCL_VERBOSE_ENTRY("mcl_json_t *root = <%p>, char *object_name = <%p>, mcl_size_t number = <%u>", root, object_name, number);
+
+    // Check type of root.
+    if ((cJSON_Array == ((cJSON *) root)->type) && (MCL_NULL == object_name))
+    {
+        cJSON *json_number = cJSON_CreateNumber(number);
+
+        if (MCL_NULL == json_number)
+        {
+            code = MCL_OUT_OF_MEMORY;
+        }
+        else
+        {
+            cJSON_AddItemToArray((cJSON *) root, json_number);
+        }
+    }
+    else if ((cJSON_Object == ((cJSON *) root)->type) && (MCL_NULL != object_name))
+    {
+        mcl_json_t *json_child = MCL_NULL;
+        code = json_util_get_object_item(root, object_name, &json_child);
+
+        if (MCL_JSON_NON_EXISTING_CHILD == code)
+        {
+            cJSON_AddNumberToObject((cJSON *) root, object_name, number);
+            code = MCL_OK;
+        }
+        else
+        {
+            code = MCL_JSON_NAME_DUPLICATION;
+        }
+    }
+    else
+    {
+        code = MCL_INVALID_PARAMETER;
+    }
+
+    MCL_VERBOSE_LEAVE("retVal = <%d>", code);
+    return code;
 }

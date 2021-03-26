@@ -26,7 +26,7 @@
  * <ul>
  * <li>#MCL_OK in case of success.</li>
  * <li>#MCL_OUT_OF_MEMORY in case there is not enough memory in the system to proceed.</li>
- * <li>#MCL_BAD_CONTENT_ENCODING if provided @p encoded_data has invalid length (0 or not multiples of 4) or if the given @p encoded_data is invalidly encoded.</li>
+ * <li>#MCL_BAD_CONTENT_ENCODING if provided @p encoded_data has invalid length (0 or not multiples of 4) or is invalidly encoded.</li>
  * </ul>
  */
 MCL_LOCAL mcl_error_t base64_decode(const char *encoded_data, mcl_uint8_t **decoded_data, mcl_size_t *decoded_data_size);
@@ -44,7 +44,7 @@ MCL_LOCAL mcl_error_t base64_decode(const char *encoded_data, mcl_uint8_t **deco
  * <ul>
  * <li>#MCL_OK in case of success.</li>
  * <li>#MCL_OUT_OF_MEMORY in case there is not enough memory in the system to proceed.</li>
- * <li>#MCL_BAD_CONTENT_ENCODING if provided @p encoded_data has invalid length (0 or not multiples of 4) or if the given @p encoded_data is invalidly encoded.</li>
+ * <li>#MCL_BAD_CONTENT_ENCODING if provided @p encoded_data has invalid length (0 or not multiples of 4) or is invalidly encoded.</li>
  * </ul>
  */
 MCL_LOCAL mcl_error_t base64_url_decode(const char *encoded_data, mcl_uint8_t **decoded_data, mcl_size_t *decoded_data_size);

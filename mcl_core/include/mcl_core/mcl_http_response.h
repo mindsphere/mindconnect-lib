@@ -102,6 +102,14 @@ extern MCL_CORE_EXPORT mcl_error_t mcl_http_response_initialize(mcl_list_t *head
 extern MCL_CORE_EXPORT mcl_error_t mcl_http_response_get_header(mcl_http_response_t *http_response, const char *header_name, char **header_value);
 
 /**
+ * This function gets the status code of the http response and converts it to equivalent MCL error code.
+ *
+ * @param [in]  http_response HTTP response handle to be used.
+ * @return MCL error code.
+ */
+extern MCL_CORE_EXPORT mcl_error_t mcl_http_response_get_status(mcl_http_response_t *http_response);
+
+/**
  * This function destroys the HTTP response handle.
  *
  * @param [in] http_response HTTP response handle.

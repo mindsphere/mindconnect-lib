@@ -53,7 +53,8 @@ mcl_error_t security_handler_hash_sha256(const mcl_uint8_t *data, mcl_size_t dat
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("const mcl_uint8_t *data = <%p>, mcl_size_t data_size = <%u>, mcl_uint8_t **hash = <%p>, mcl_size_t *hash_size = <%p>", data, data_size, hash, hash_size);
+    MCL_DEBUG_ENTRY("const mcl_uint8_t *data = <%p>, mcl_size_t data_size = <%u>, mcl_uint8_t **hash = <%p>, mcl_size_t *hash_size = <%p>",
+        data, data_size, hash, hash_size);
 
     code = security_hash_sha256(data, data_size, hash, hash_size);
     if (MCL_OK == code)
@@ -69,14 +70,16 @@ mcl_error_t security_handler_hash_sha256(const mcl_uint8_t *data, mcl_size_t dat
     return code;
 }
 
-mcl_error_t security_handler_hmac_sha256(security_handler_t *security_handler, const mcl_uint8_t *data, mcl_size_t data_size, mcl_uint8_t **hash, mcl_size_t *hash_size)
+mcl_error_t security_handler_hmac_sha256(security_handler_t *security_handler, const mcl_uint8_t *data, mcl_size_t data_size,
+    mcl_uint8_t **hash, mcl_size_t *hash_size)
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("security_handler_t *security_handler = <%p>, const mcl_uint8_t *data = <%p>, mcl_size_t data_size = <%u>, mcl_uint8_t **hash = <%p>, mcl_size_t *hash_size = <%p>",
-                security_handler, data, data_size, hash, hash_size);
+    MCL_DEBUG_ENTRY("security_handler_t *security_handler = <%p>, const mcl_uint8_t *data = <%p>, mcl_size_t data_size = <%u>, "\
+        "mcl_uint8_t **hash = <%p>, mcl_size_t *hash_size = <%p>", security_handler, data, data_size, hash, hash_size);
 
-    code = hmac_sha256((const mcl_uint8_t *) data, data_size, (const mcl_uint8_t *) security_handler->client_secret, string_util_strlen(security_handler->client_secret), hash, hash_size);
+    code = hmac_sha256((const mcl_uint8_t *) data, data_size, (const mcl_uint8_t *) security_handler->client_secret,
+        string_util_strlen(security_handler->client_secret), hash, hash_size);
 
     if (MCL_OK == code)
     {
@@ -116,7 +119,8 @@ mcl_error_t security_handler_base64_decode(const char *encoded_data, mcl_uint8_t
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("const char *encoded_data = <%p>, mcl_uint8_t **decoded_data = <%p>, mcl_size_t *decoded_data_size = <%p>", encoded_data, decoded_data, decoded_data_size);
+    MCL_DEBUG_ENTRY("const char *encoded_data = <%p>, mcl_uint8_t **decoded_data = <%p>, mcl_size_t *decoded_data_size = <%p>",
+        encoded_data, decoded_data, decoded_data_size);
 
     code = base64_decode(encoded_data, decoded_data, decoded_data_size);
 
@@ -161,8 +165,8 @@ mcl_error_t security_handler_rsa_sign(char *rsa_key, char *data, mcl_size_t data
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("char *rsa_key = <%p>, char *data = <%p>, mcl_size_t data_size = <%u>, mcl_uint8_t **signature = <%p>, mcl_size_t *signature_size = <%p>", rsa_key, data,
-                data_size, signature, signature_size);
+    MCL_DEBUG_ENTRY("char *rsa_key = <%p>, char *data = <%p>, mcl_size_t data_size = <%u>, mcl_uint8_t **signature = <%p>, mcl_size_t *signature_size = <%p>",
+        rsa_key, data, data_size, signature, signature_size);
 
     code = security_rsa_sign(rsa_key, data, data_size, signature, signature_size);
 

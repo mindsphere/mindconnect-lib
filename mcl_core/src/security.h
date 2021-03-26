@@ -59,8 +59,8 @@ MCL_LOCAL mcl_error_t security_rsa_sign(char *rsa_key, char *data, mcl_size_t da
  *
  * Generated keys will be returned as out parameters.
  *
- * @param [out] public_key Generated public key. New memory space will be allocated for this parameter. Ownership passed to caller. Caller must free the space.
- * @param [out] private_key Generated private key. New memory space will be allocated for this parameter. Ownership passed to caller. Caller must free the space.
+ * @param [out] public_key Generated public key. New memory space will be allocated for this parameter.
+ * @param [out] private_key Generated private key. New memory space will be allocated for this parameter.
  * @return
  * <ul>
  * <li>#MCL_OK in case of success.</li>

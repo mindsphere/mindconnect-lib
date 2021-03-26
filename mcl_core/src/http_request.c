@@ -61,7 +61,8 @@ mcl_error_t mcl_http_request_add_header(mcl_http_request_t *http_request, const 
     mcl_size_t header_line_length;
     char *header_line;
 
-    MCL_DEBUG_ENTRY("mcl_http_request_t *http_request = <%p>, const char *header_name = <%p>, const char *header_value = <%p>", http_request, header_name, header_value);
+    MCL_DEBUG_ENTRY("mcl_http_request_t *http_request = <%p>, const char *header_name = <%p>, const char *header_value = <%p>",
+        http_request, header_name, header_value);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(http_request, code);
@@ -97,7 +98,8 @@ mcl_error_t mcl_http_request_set_parameter(mcl_http_request_t *http_request, E_M
 {
     mcl_error_t code = MCL_OK;
 
-    MCL_DEBUG_ENTRY("mcl_http_request_t *http_request = <%p>, E_MCL_HTTP_REQUEST_PARAMETER parameter = <%d>, const void *value = <%p>", http_request, parameter, value);
+    MCL_DEBUG_ENTRY("mcl_http_request_t *http_request = <%p>, E_MCL_HTTP_REQUEST_PARAMETER parameter = <%d>, const void *value = <%p>",
+        http_request, parameter, value);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(http_request, code);

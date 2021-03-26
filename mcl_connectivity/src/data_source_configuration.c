@@ -14,17 +14,20 @@
 // This array is used to get the data source configuration version.
 const char *mcl_data_source_configuration_versions[MCL_DATA_SOURCE_CONFIGURATION_END] = { "1.0" };
 
-mcl_error_t mcl_data_source_configuration_initialize(E_MCL_DATA_SOURCE_CONFIGURATION_VERSION version, mcl_data_source_configuration_t **data_source_configuration)
+mcl_error_t mcl_data_source_configuration_initialize(E_MCL_DATA_SOURCE_CONFIGURATION_VERSION version,
+    mcl_data_source_configuration_t **data_source_configuration)
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("E_MCL_DATA_SOURCE_CONFIGURATION_VERSION version = <%d>, mcl_data_source_configuration_t **data_source_configuration = <%p>", version, data_source_configuration);
+    MCL_DEBUG_ENTRY("E_MCL_DATA_SOURCE_CONFIGURATION_VERSION version = <%d>, mcl_data_source_configuration_t **data_source_configuration = <%p>",
+        version, data_source_configuration);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(data_source_configuration, code);
 
     // Check data source configuration version parameter.
-    MCL_ASSERT_CODE_MESSAGE(MCL_DATA_SOURCE_CONFIGURATION_1_0 <= version && MCL_DATA_SOURCE_CONFIGURATION_END > version, MCL_INVALID_PARAMETER, "Invalid data source configuration version parameter.");
+    MCL_ASSERT_CODE_MESSAGE(MCL_DATA_SOURCE_CONFIGURATION_1_0 <= version && MCL_DATA_SOURCE_CONFIGURATION_END > version, MCL_INVALID_PARAMETER,
+        "Invalid data source configuration version parameter.");
 
     // Allocate memory for data source configuration.
     if (MCL_NULL != MCL_NEW(*data_source_configuration))
@@ -62,11 +65,13 @@ MCL_FUNCTION_LEAVE_LABEL:
     return code;
 }
 
-mcl_error_t mcl_data_source_configuration_set_parameter(mcl_data_source_configuration_t *data_source_configuration, E_MCL_DATA_SOURCE_CONFIGURATION_PARAMETER parameter, const void *value)
+mcl_error_t mcl_data_source_configuration_set_parameter(mcl_data_source_configuration_t *data_source_configuration,
+    E_MCL_DATA_SOURCE_CONFIGURATION_PARAMETER parameter, const void *value)
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("mcl_data_source_configuration_t *data_source_configuration = <%p>, E_MCL_DATA_SOURCE_CONFIGURATION_PARAMETER parameter = <%d>, const void *value = <%p>", data_source_configuration, parameter, value);
+    MCL_DEBUG_ENTRY("mcl_data_source_configuration_t *data_source_configuration = <%p>, "\
+        "E_MCL_DATA_SOURCE_CONFIGURATION_PARAMETER parameter = <%d>, const void *value = <%p>", data_source_configuration, parameter, value);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(data_source_configuration, code);
@@ -90,7 +95,8 @@ mcl_error_t mcl_data_source_configuration_add_data_source(mcl_data_source_config
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("mcl_data_source_configuration_t *data_source_configuration = <%p>, mcl_data_source_t *data_source = <%p>", data_source_configuration, data_source);
+    MCL_DEBUG_ENTRY("mcl_data_source_configuration_t *data_source_configuration = <%p>, mcl_data_source_t *data_source = <%p>",
+        data_source_configuration, data_source);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(data_source_configuration, code);

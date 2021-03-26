@@ -63,7 +63,8 @@ mcl_error_t jwt_initialize(security_handler_t *security_handler, E_MCL_SECURITY_
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("security_handler_t *security_handler = <%p>, E_MCL_SECURITY_PROFILE security_profile = <%d>, char *tenant = <%s>, jwt_t **jwt = <%p>", security_handler, security_profile, tenant, jwt);
+    MCL_DEBUG_ENTRY("security_handler_t *security_handler = <%p>, E_MCL_SECURITY_PROFILE security_profile = <%d>, char *tenant = <%s>, jwt_t **jwt = <%p>",
+        security_handler, security_profile, tenant, jwt);
 
     // Allocate memory for JWT handle.
     MCL_NEW(*jwt);
@@ -280,7 +281,8 @@ static mcl_error_t _generate_token(jwt_t *jwt, char *header, char *payload, char
     MCL_DEBUG_ENTRY("jwt_t *jwt = <%p>, char *header = <%s>, char *payload = <%s>, char **token = <%p>", jwt, header, payload, token);
 
     // Encode header and payload to base64 url.
-    MCL_ASSERT_CODE_MESSAGE(MCL_OK == _get_header_and_payload_encoded_base64_url(header, payload, &header_encoded, &payload_encoded), MCL_FAIL, "Encode header - payload failed!");
+    MCL_ASSERT_CODE_MESSAGE(MCL_OK == _get_header_and_payload_encoded_base64_url(header, payload, &header_encoded, &payload_encoded), MCL_FAIL,
+        "Encode header - payload failed!");
 
     // Join header and payload. This joined header and payload must not be lost, it will be used again.
     MCL_ASSERT_CODE_MESSAGE(MCL_OK == _join_with_dot(header_encoded, payload_encoded, &header_and_payload), MCL_FAIL, "Join header and payload failed!");
@@ -301,13 +303,16 @@ static mcl_error_t _generate_token(jwt_t *jwt, char *header, char *payload, char
 
 static mcl_error_t _get_header_and_payload_encoded_base64_url(char *header, char *payload, char **header_encoded, char **payload_encoded)
 {
-    MCL_DEBUG_ENTRY("char *header = <%s>, char *payload = <%s>, char **header_encoded = <%p>, char **payload_encoded = <%p>", header, payload, header_encoded, payload_encoded);
+    MCL_DEBUG_ENTRY("char *header = <%s>, char *payload = <%s>, char **header_encoded = <%p>, char **payload_encoded = <%p>",
+        header, payload, header_encoded, payload_encoded);
 
     // Encode header.
-    MCL_ASSERT_CODE_MESSAGE(MCL_OK == security_handler_base64_url_encode((mcl_uint8_t *) header, string_util_strlen(header), header_encoded), MCL_FAIL, "Header encoding failed!");
+    MCL_ASSERT_CODE_MESSAGE(MCL_OK == security_handler_base64_url_encode((mcl_uint8_t *) header, string_util_strlen(header), header_encoded),
+        MCL_FAIL, "Header encoding failed!");
 
     // Encode payload.
-    MCL_ASSERT_STATEMENT_CODE_MESSAGE(MCL_OK == security_handler_base64_url_encode((mcl_uint8_t *) payload, string_util_strlen(payload), payload_encoded), MCL_FREE(*header_encoded), MCL_FAIL, "Payload encoding failed!");
+    MCL_ASSERT_STATEMENT_CODE_MESSAGE(MCL_OK == security_handler_base64_url_encode((mcl_uint8_t *) payload, string_util_strlen(payload), payload_encoded),
+        MCL_FREE(*header_encoded), MCL_FAIL, "Payload encoding failed!");
 
     MCL_DEBUG_LEAVE("retVal = <%d>", MCL_OK);
     return MCL_OK;
@@ -361,7 +366,8 @@ static mcl_error_t _calculate_signature(jwt_t *jwt, char *header_and_payload, ch
     // Calculate HMAC SHA256 of header and payload.
     if (MCL_SECURITY_SHARED_SECRET == jwt->security_profile)
     {
-        code = security_handler_hmac_sha256(jwt->security_handler, (mcl_uint8_t *) header_and_payload, string_util_strlen(header_and_payload), &hash, &hash_size);
+        code = security_handler_hmac_sha256(jwt->security_handler, (mcl_uint8_t *) header_and_payload, string_util_strlen(header_and_payload),
+            &hash, &hash_size);
     }
     else
     {

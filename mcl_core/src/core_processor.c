@@ -94,12 +94,14 @@ static mcl_error_t _compose_rsa_onboarding_json(security_handler_t *security_han
 // Composes JSON string for key rotation with RSA security profile.
 static mcl_error_t _compose_rsa_key_rotation_json(security_handler_t *security_handler, char **payload);
 
+// Adds jwks to root json.
+static mcl_error_t _add_jwks(mcl_json_t *root, security_handler_t *security_handler);
+
 // Adds key json object to keys json array.
 static mcl_error_t _add_key_to_keys_array(mcl_json_t *root, mcl_json_t **json_object);
 
 // Use custom function for loading register info.
 static mcl_error_t _custom_load_register_info(core_processor_t *core_processor);
-static mcl_error_t _evaluate_response_codes(mcl_http_response_t *response);
 static mcl_error_t _generate_correlation_id_string(char **correlation_id);
 
 // Saves credentials.
@@ -173,7 +175,8 @@ mcl_error_t core_processor_initialize(core_configuration_t *configuration, core_
     MCL_DEBUG("Security handler is successfully initialized.");
 
     // Load credentials via custom functions if both function pointers are not null.
-    if ((MCL_NULL != (*core_processor)->configuration->credentials_load_callback.rsa) && (MCL_NULL != (*core_processor)->configuration->credentials_save_callback.rsa))
+    if ((MCL_NULL != (*core_processor)->configuration->credentials_load_callback.rsa) &&
+        (MCL_NULL != (*core_processor)->configuration->credentials_save_callback.rsa))
     {
         return_code = _custom_load_register_info(*core_processor);
 
@@ -199,12 +202,14 @@ mcl_error_t core_processor_initialize(core_configuration_t *configuration, core_
     // Populate endpoints in configuration.
     if (MCL_OK == return_code)
     {
-        return_code = string_util_concatenate((*core_processor)->configuration->mindsphere_hostname, endpoint_uri[ENDPOINT_URI_REGISTER], &(*core_processor)->configuration->register_endpoint);
+        return_code = string_util_concatenate((*core_processor)->configuration->mindsphere_hostname, endpoint_uri[ENDPOINT_URI_REGISTER],
+            &(*core_processor)->configuration->register_endpoint);
     }
 
     if (MCL_OK == return_code)
     {
-        return_code = string_util_concatenate((*core_processor)->configuration->mindsphere_hostname, endpoint_uri[ENDPOINT_URI_ACCESS_TOKEN], &(*core_processor)->configuration->token_endpoint);
+        return_code = string_util_concatenate((*core_processor)->configuration->mindsphere_hostname, endpoint_uri[ENDPOINT_URI_ACCESS_TOKEN],
+            &(*core_processor)->configuration->token_endpoint);
     }
 
     if (MCL_OK != return_code)
@@ -292,7 +297,8 @@ mcl_error_t core_processor_register(core_processor_t *core_processor)
         if (MCL_SECURITY_SHARED_SECRET == core_processor->configuration->security_profile)
         {
             // Payload length including null character size.
-            payload_length = (mcl_uint32_t) ((sizeof(_client_id_format) - sizeof(_string_identifier)) + string_util_strlen(core_processor->security_handler->client_id) + MCL_NULL_CHAR_SIZE);
+            payload_length = (mcl_uint32_t) ((sizeof(_client_id_format) - sizeof(_string_identifier)) +
+                string_util_strlen(core_processor->security_handler->client_id) + MCL_NULL_CHAR_SIZE);
             payload = MCL_MALLOC(payload_length);
             if (MCL_NULL != payload)
             {
@@ -412,9 +418,10 @@ static mcl_error_t _process_registration_response(core_processor_t *core_process
     mcl_error_t server_response;
     mcl_bool_t is_onboard_request;
 
-    MCL_DEBUG_ENTRY("core_processor_t *core_processor = <%p>, mcl_http_response_t *http_response = <%p>, char *correlation_id = <%p> ", core_processor, http_response, correlation_id);
+    MCL_DEBUG_ENTRY("core_processor_t *core_processor = <%p>, mcl_http_response_t *http_response = <%p>, char *correlation_id = <%p> ",
+        core_processor, http_response, correlation_id);
 
-    server_response = _evaluate_response_codes(http_response);
+    server_response = mcl_http_response_get_status(http_response);
     is_onboard_request = (MCL_NULL == core_processor->security_handler->registration_access_token) ? MCL_TRUE : MCL_FALSE;
 
     if (MCL_TRUE == is_onboard_request)
@@ -499,16 +506,19 @@ mcl_error_t core_processor_update_credentials(core_processor_t *core_processor)
 
     MCL_DEBUG_ENTRY("core_processor_t *core_processor = <%p>", core_processor);
 
-    callbacks_are_used = (MCL_NULL != core_processor->configuration->credentials_load_callback.shared_secret) && (MCL_NULL != core_processor->configuration->credentials_save_callback.shared_secret);
+    callbacks_are_used = (MCL_NULL != core_processor->configuration->credentials_load_callback.shared_secret) &&
+        (MCL_NULL != core_processor->configuration->credentials_save_callback.shared_secret);
     MCL_ASSERT_CODE_MESSAGE(MCL_TRUE == callbacks_are_used, MCL_FAIL, "There is no way to update credentials.");
 
     if (MCL_SECURITY_SHARED_SECRET == core_processor->configuration->security_profile)
     {
-        code = core_processor->configuration->credentials_load_callback.shared_secret(&client_id, &client_secret, &registration_access_token, &registration_uri);
+        code = core_processor->configuration->credentials_load_callback.shared_secret(&client_id, &client_secret,
+            &registration_access_token, &registration_uri);
     }
     else
     {
-        code = core_processor->configuration->credentials_load_callback.rsa(&client_id, &public_key, &private_key, &registration_access_token, &registration_uri);
+        code = core_processor->configuration->credentials_load_callback.rsa(&client_id, &public_key, &private_key,
+            &registration_access_token, &registration_uri);
     }
 
     // If loading credentials is failed, user must have set all parameters to NULL. No need to clean up.
@@ -574,7 +584,8 @@ static mcl_error_t _check_client_secret(core_processor_t *core_processor, char *
     mcl_size_t length;
     mcl_error_t code = MCL_FAIL;
 
-    MCL_DEBUG_ENTRY("core_processor_t *core_processor = <%p>, char *registration_access_token = <%p>, char *client_secret = <%p>", core_processor, registration_access_token, client_secret);
+    MCL_DEBUG_ENTRY("core_processor_t *core_processor = <%p>, char *registration_access_token = <%p>, char *client_secret = <%p>",
+        core_processor, registration_access_token, client_secret);
 
     length = string_util_strlen(core_processor->security_handler->client_secret);
 
@@ -698,7 +709,7 @@ mcl_error_t core_processor_get_access_token(core_processor_t *core_processor)
             core_processor->security_handler->last_token_time = server_time_header;
         }
 
-        code = _evaluate_response_codes(response);
+        code = mcl_http_response_get_status(response);
 
         if (MCL_OK == code)
         {
@@ -928,64 +939,18 @@ mcl_error_t _process_registration_response_rsa_3072(core_processor_t *core_proce
     return code;
 }
 
-static mcl_error_t _compose_rsa_onboarding_json(security_handler_t * security_handler, char **payload)
+static mcl_error_t _compose_rsa_onboarding_json(security_handler_t *security_handler, char **payload)
 {
     mcl_error_t code;
     mcl_json_t *root = MCL_NULL;
-    mcl_json_t *jwks = MCL_NULL;
-    mcl_json_t *keys = MCL_NULL;
-    mcl_json_t *key = MCL_NULL;
-    char *kid = MCL_NULL;
-    char *modulus = MCL_NULL;
-    char *public_exponent = MCL_NULL;
 
     MCL_DEBUG_ENTRY("security_handler_t *security_handler = <%p>, char **payload = <%p>", security_handler, payload);
 
-    code = security_rsa_get_modulus_and_exponent(security_handler->rsa.public_key, &modulus, &public_exponent);
+    code = json_util_initialize(MCL_JSON_OBJECT, &root);
 
     if (MCL_OK == code)
     {
-        code = json_util_initialize(MCL_JSON_OBJECT, &root);
-    }
-
-    if (MCL_OK == code)
-    {
-        code = json_util_start_object(root, JSON_NAME_JWKS, &jwks);
-    }
-
-    if (MCL_OK == code)
-    {
-        code = json_util_start_array(jwks, JSON_NAME_KEYS, &keys);
-    }
-
-    if (MCL_OK == code)
-    {
-        code = _add_key_to_keys_array(keys, &key);
-    }
-
-    if (MCL_OK == code)
-    {
-        code = json_util_add_string(key, JSON_NAME_E, public_exponent);
-    }
-
-    if (MCL_OK == code)
-    {
-        code = json_util_add_string(key, JSON_NAME_N, modulus);
-    }
-
-    if (MCL_OK == code)
-    {
-        code = json_util_add_string(key, JSON_NAME_KTY, "RSA");
-    }
-
-    if (MCL_OK == code)
-    {
-        code = random_generate_guid(&kid);
-    }
-
-    if (MCL_OK == code)
-    {
-        code = json_util_add_string(key, JSON_NAME_KID, kid);
+        code = _add_jwks(root, security_handler);
     }
 
     if (MCL_OK == code)
@@ -998,36 +963,22 @@ static mcl_error_t _compose_rsa_onboarding_json(security_handler_t * security_ha
         MCL_FREE(*payload);
     }
 
-    MCL_FREE(modulus);
-    MCL_FREE(public_exponent);
-    MCL_FREE(kid);
     json_util_destroy(&root);
 
     MCL_DEBUG_LEAVE("retVal = <%d>", code);
     return code;
 }
 
-static mcl_error_t _compose_rsa_key_rotation_json(security_handler_t * security_handler, char **payload)
+static mcl_error_t _compose_rsa_key_rotation_json(security_handler_t *security_handler, char **payload)
 {
     mcl_error_t code;
     mcl_json_t *root = MCL_NULL;
-    mcl_json_t *jwks = MCL_NULL;
-    mcl_json_t *keys = MCL_NULL;
-    mcl_json_t *key = MCL_NULL;
-    char *modulus = MCL_NULL;
-    char *public_exponent = MCL_NULL;
-    char *kid = MCL_NULL;
 
     MCL_DEBUG_ENTRY("security_handler_t *security_handler = <%p>, char **payload = <%p>", security_handler, payload);
 
     MCL_FREE(security_handler->rsa.public_key);
     MCL_FREE(security_handler->rsa.private_key);
     code = security_handler_generate_rsa_key(security_handler);
-
-    if (MCL_OK == code)
-    {
-        code = security_rsa_get_modulus_and_exponent(security_handler->rsa.public_key, &modulus, &public_exponent);
-    }
 
     if (MCL_OK == code)
     {
@@ -1041,6 +992,41 @@ static mcl_error_t _compose_rsa_key_rotation_json(security_handler_t * security_
 
     if (MCL_OK == code)
     {
+        code = _add_jwks(root, security_handler);
+    }
+
+    if (MCL_OK == code)
+    {
+        code = json_util_to_string(root, payload);
+    }
+
+    if (MCL_OK != code)
+    {
+        MCL_FREE(*payload);
+    }
+
+    json_util_destroy(&root);
+
+    MCL_DEBUG_LEAVE("retVal = <%d>", code);
+    return code;
+}
+
+static mcl_error_t _add_jwks(mcl_json_t *root, security_handler_t *security_handler)
+{
+    mcl_error_t code;
+    mcl_json_t *jwks = MCL_NULL;
+    mcl_json_t *keys = MCL_NULL;
+    mcl_json_t *key = MCL_NULL;
+    char *modulus = MCL_NULL;
+    char *public_exponent = MCL_NULL;
+    char *kid = MCL_NULL;
+
+    MCL_DEBUG_ENTRY("mcl_json_t *root = <%p>, security_handler_t *security_handler = <%p>", root, security_handler);
+
+    code = security_rsa_get_modulus_and_exponent(security_handler->rsa.public_key, &modulus, &public_exponent);
+
+    if (MCL_OK == code)
+    {
         code = json_util_start_object(root, JSON_NAME_JWKS, &jwks);
     }
 
@@ -1079,20 +1065,9 @@ static mcl_error_t _compose_rsa_key_rotation_json(security_handler_t * security_
         code = json_util_add_string(key, JSON_NAME_KID, kid);
     }
 
-    if (MCL_OK == code)
-    {
-        code = json_util_to_string(root, payload);
-    }
-
-    if (MCL_OK != code)
-    {
-        MCL_FREE(*payload);
-    }
-
     MCL_FREE(modulus);
     MCL_FREE(public_exponent);
     MCL_FREE(kid);
-    json_util_destroy(&root);
 
     MCL_DEBUG_LEAVE("retVal = <%d>", code);
     return code;
@@ -1123,73 +1098,20 @@ static mcl_error_t _custom_load_register_info(core_processor_t *core_processor)
 
     if (MCL_SECURITY_SHARED_SECRET == core_processor->configuration->security_profile)
     {
-        code = core_processor->configuration->credentials_load_callback.shared_secret(&(core_processor->security_handler->client_id), &(core_processor->security_handler->client_secret), &(core_processor->security_handler->registration_access_token), &(core_processor->security_handler->registration_uri));
+        code = core_processor->configuration->credentials_load_callback.shared_secret(
+            &(core_processor->security_handler->client_id),
+            &(core_processor->security_handler->client_secret),
+            &(core_processor->security_handler->registration_access_token),
+            &(core_processor->security_handler->registration_uri));
     }
     else
     {
-        code = core_processor->configuration->credentials_load_callback.rsa(&(core_processor->security_handler->client_id), &(core_processor->security_handler->rsa.public_key), &(core_processor->security_handler->rsa.private_key), &(core_processor->security_handler->registration_access_token), &(core_processor->security_handler->registration_uri));
-    }
-
-    MCL_DEBUG_LEAVE("retVal = <%d>", code);
-    return code;
-}
-
-static mcl_error_t _evaluate_response_codes(mcl_http_response_t *response)
-{
-    mcl_error_t code;
-
-    MCL_DEBUG_ENTRY("mcl_http_response_t *response = <%p>", response);
-
-    switch (response->status_code)
-    {
-        case MCL_HTTP_STATUS_CODE_SUCCESS:
-            code = MCL_OK;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_CREATED:
-            code = MCL_CREATED;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_PARTIAL_CONTENT:
-            code = MCL_PARTIAL_CONTENT;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_BAD_REQUEST:
-            code = MCL_BAD_REQUEST;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_UNAUTHORIZED:
-            code = MCL_UNAUTHORIZED;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_FORBIDDEN:
-            code = MCL_FORBIDDEN;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_NOT_FOUND:
-            code = MCL_NOT_FOUND;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_INTERNAL_SERVER_ERR:
-            code = MCL_SERVER_FAIL;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_CONFLICT:
-            code = MCL_CONFLICT;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_PRECONDITION_FAILED:
-            code = MCL_PRECONDITION_FAIL;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_PAYLOAD_TOO_LARGE:
-            code = MCL_REQUEST_PAYLOAD_TOO_LARGE;
-            break;
-
-        default:
-            code = MCL_UNEXPECTED_RESULT_CODE;
-            MCL_INFO("Server responded with unexpected HTTP status code %d.", response->status_code);
-            break;
+        code = core_processor->configuration->credentials_load_callback.rsa(
+            &(core_processor->security_handler->client_id),
+            &(core_processor->security_handler->rsa.public_key),
+            &(core_processor->security_handler->rsa.private_key),
+            &(core_processor->security_handler->registration_access_token),
+            &(core_processor->security_handler->registration_uri));
     }
 
     MCL_DEBUG_LEAVE("retVal = <%d>", code);
@@ -1239,15 +1161,25 @@ static mcl_error_t _save_credentials(core_processor_t *core_processor)
     MCL_DEBUG_ENTRY("core_processor_t *core_processor = <%p>", core_processor);
 
     // Store credentials via custom functions if both function pointers are not null.
-    if ((MCL_NULL != core_processor->configuration->credentials_load_callback.rsa) && (MCL_NULL != core_processor->configuration->credentials_save_callback.rsa))
+    if ((MCL_NULL != core_processor->configuration->credentials_load_callback.rsa) &&
+        (MCL_NULL != core_processor->configuration->credentials_save_callback.rsa))
     {
         if (MCL_SECURITY_SHARED_SECRET == core_processor->configuration->security_profile)
         {
-            result = core_processor->configuration->credentials_save_callback.shared_secret(core_processor->security_handler->client_id, core_processor->security_handler->client_secret, core_processor->security_handler->registration_access_token, core_processor->security_handler->registration_uri);
+            result = core_processor->configuration->credentials_save_callback.shared_secret(
+                core_processor->security_handler->client_id,
+                core_processor->security_handler->client_secret,
+                core_processor->security_handler->registration_access_token,
+                core_processor->security_handler->registration_uri);
         }
         else
         {
-            result = core_processor->configuration->credentials_save_callback.rsa(core_processor->security_handler->client_id, (char *)core_processor->security_handler->rsa.public_key, (char *)core_processor->security_handler->rsa.private_key, core_processor->security_handler->registration_access_token, core_processor->security_handler->registration_uri);
+            result = core_processor->configuration->credentials_save_callback.rsa(
+                core_processor->security_handler->client_id,
+                (char *) core_processor->security_handler->rsa.public_key,
+                (char *) core_processor->security_handler->rsa.private_key,
+                core_processor->security_handler->registration_access_token,
+                core_processor->security_handler->registration_uri);
         }
     }
 

@@ -69,9 +69,6 @@ static mcl_error_t _generate_correlation_id_string(char *correlation_id);
 // Function used to evaluate the response to the exchange request.
 static mcl_error_t _evaluate_response_for_exchange(mcl_http_response_t *response, const char *correlation_id);
 
-// Function used to map status code of the response to MCL return code.
-static mcl_error_t _evaluate_response_codes(mcl_http_response_t *response);
-
 // Function used to add file tuple with callback.
 static mcl_size_t _file_payload_callback(char *buffer, mcl_size_t size, mcl_size_t count, void *user_context);
 
@@ -355,7 +352,7 @@ mcl_error_t connectivity_processor_create_mapping(connectivity_processor_t *conn
                 MCL_ERROR("HTTP Response:\n%.*s", http_response->payload_size, http_response->payload);
             }
 
-            code = _evaluate_response_codes(http_response);
+            code = mcl_http_response_get_status(http_response);
 
             if (MCL_OK == code)
             {
@@ -382,7 +379,8 @@ mcl_error_t connectivity_processor_get_data_source_configuration(connectivity_pr
     char *url;
     *configuration = MCL_NULL;
 
-    MCL_DEBUG_ENTRY("connectivity_processor_t *connectivity_processor = <%p>, data_source_configuration_t **configuration = <%p>", connectivity_processor, configuration);
+    MCL_DEBUG_ENTRY("connectivity_processor_t *connectivity_processor = <%p>, data_source_configuration_t **configuration = <%p>",
+        connectivity_processor, configuration);
 
     // Calculate url length.
     agent_id_length = mcl_string_util_strlen(connectivity_processor->agent_id);
@@ -461,7 +459,7 @@ mcl_error_t connectivity_processor_get_data_source_configuration(connectivity_pr
         }
         else
         {
-            code = _evaluate_response_codes(http_response);
+            code = mcl_http_response_get_status(http_response);
         }
     }
 
@@ -475,7 +473,8 @@ static mcl_error_t _scan_store_after_exchange(store_t *store, mcl_bool_t *store_
 {
     mcl_error_t code = exchange_response;
 
-    MCL_DEBUG_ENTRY("store_t *store = <%p>, mcl_bool_t *store_fully_processed = <%p>, mcl_error_t exchange_response = <%d>", store, store_fully_processed, exchange_response);
+    MCL_DEBUG_ENTRY("store_t *store = <%p>, mcl_bool_t *store_fully_processed = <%p>, mcl_error_t exchange_response = <%d>",
+        store, store_fully_processed, exchange_response);
 
     if (MCL_OK == code)
     {
@@ -501,7 +500,8 @@ static mcl_error_t _add_http_headers_for_exchange(connectivity_processor_t *proc
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("connectivity_processor_t *processor = <%p>, mcl_http_request_t *request = <%p>, const char *boundary = <%p>", processor, request, boundary);
+    MCL_DEBUG_ENTRY("connectivity_processor_t *processor = <%p>, mcl_http_request_t *request = <%p>, const char *boundary = <%p>",
+        processor, request, boundary);
 
     // Add boundary.
     code = _add_multipart_mixed_content_type_header(request, boundary);
@@ -523,12 +523,13 @@ static mcl_error_t _add_http_headers_for_exchange(connectivity_processor_t *proc
 static mcl_error_t _add_multipart_mixed_content_type_header(mcl_http_request_t *request, const char *boundary)
 {
     mcl_error_t code;
-    mcl_size_t header_value_length;
     char *header_value;
+    mcl_size_t header_value_length;
+    mcl_size_t constant_part_length = 24;
 
     MCL_DEBUG_ENTRY("mcl_http_request_t *request = <%p>, const char *boundary = <%p>", request, boundary);
 
-    header_value_length = mcl_string_util_strlen(content_type_values[CONTENT_TYPE_MULTIPART_MIXED]) + mcl_string_util_strlen(boundary) + 24;
+    header_value_length = mcl_string_util_strlen(content_type_values[CONTENT_TYPE_MULTIPART_MIXED]) + mcl_string_util_strlen(boundary) + constant_part_length;
 
     header_value = MCL_MALLOC(header_value_length + 1);
 
@@ -540,7 +541,8 @@ static mcl_error_t _add_multipart_mixed_content_type_header(mcl_http_request_t *
     else
     {
         // Compose header value.
-        code = mcl_string_util_snprintf(header_value, header_value_length + 1, "%s;boundary=%s;charset=utf-8", content_type_values[CONTENT_TYPE_MULTIPART_MIXED], boundary);
+        code = mcl_string_util_snprintf(header_value, header_value_length + 1, "%s;boundary=%s;charset=utf-8",
+            content_type_values[CONTENT_TYPE_MULTIPART_MIXED], boundary);
 
         // Add header to http request.
         if (MCL_OK == code)
@@ -597,73 +599,7 @@ static mcl_error_t _evaluate_response_for_exchange(mcl_http_response_t *response
             MCL_ERROR("HTTP Response:\n%.*s", response->payload_size, response->payload);
         }
 
-        code = _evaluate_response_codes(response);
-    }
-
-    MCL_DEBUG_LEAVE("retVal = <%d>", code);
-    return code;
-}
-
-static mcl_error_t _evaluate_response_codes(mcl_http_response_t *response)
-{
-    mcl_error_t code;
-
-    MCL_DEBUG_ENTRY("mcl_http_response_t *response = <%p>", response);
-
-    switch (response->status_code)
-    {
-        case MCL_HTTP_STATUS_CODE_SUCCESS:
-            code = MCL_OK;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_CREATED:
-            code = MCL_CREATED;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_PARTIAL_CONTENT:
-            code = MCL_PARTIAL_CONTENT;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_BAD_REQUEST:
-            code = MCL_BAD_REQUEST;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_UNAUTHORIZED:
-            code = MCL_UNAUTHORIZED;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_FORBIDDEN:
-            code = MCL_FORBIDDEN;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_NOT_FOUND:
-            code = MCL_NOT_FOUND;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_INTERNAL_SERVER_ERR:
-            code = MCL_SERVER_FAIL;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_CONFLICT:
-            code = MCL_CONFLICT;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_PRECONDITION_FAILED:
-            code = MCL_PRECONDITION_FAIL;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_PAYLOAD_TOO_LARGE:
-            code = MCL_REQUEST_PAYLOAD_TOO_LARGE;
-            break;
-
-        case MCL_HTTP_RESULT_CODE_TOO_MANY_REQUESTS:
-            code = MCL_TOO_MANY_REQUESTS;
-            break;
-
-        default:
-            code = MCL_UNEXPECTED_RESULT_CODE;
-            MCL_INFO("Server responded with unexpected HTTP status code %d.", response->status_code);
-            break;
+        code = mcl_http_response_get_status(response);
     }
 
     MCL_DEBUG_LEAVE("retVal = <%d>", code);
@@ -674,7 +610,7 @@ static mcl_error_t _generate_correlation_id_string(char *correlation_id)
 {
     mcl_error_t code;
     mcl_int16_t index;
-    unsigned char *id = (unsigned char*)correlation_id;
+    unsigned char *id = (unsigned char*) correlation_id;
 
     MCL_DEBUG_ENTRY("char *correlation_id = <%p>", correlation_id);
 
@@ -728,7 +664,8 @@ static mcl_error_t _add_item_to_buffer(char *buffer, mcl_size_t *buffer_size, mc
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("char *buffer = <%p>, mcl_size_t *buffer_size = <%p>, mcl_item_t *item = <%p>, const char *boundary = <%p>", buffer, buffer_size, item, boundary);
+    MCL_DEBUG_ENTRY("char *buffer = <%p>, mcl_size_t *buffer_size = <%p>, mcl_item_t *item = <%p>, const char *boundary = <%p>",
+        buffer, buffer_size, item, boundary);
 
     switch (item->type)
     {
@@ -740,7 +677,8 @@ static mcl_error_t _add_item_to_buffer(char *buffer, mcl_size_t *buffer_size, mc
 
         case MCL_ITEM_TYPE_FILE:
             mcl_file_util_rewind(((file_t *) item)->payload->file_descriptor);
-            code = multipart_add_tuple_with_callback(buffer, buffer_size, item, boundary, content_type_values[CONTENT_TYPE_APPLICATION_OCTET_STREAM], _file_payload_callback, item);
+            code = multipart_add_tuple_with_callback(buffer, buffer_size, item, boundary,
+                content_type_values[CONTENT_TYPE_APPLICATION_OCTET_STREAM], _file_payload_callback, item);
             break;
 
         case MCL_ITEM_TYPE_CUSTOM_DATA:
@@ -886,7 +824,8 @@ static mcl_error_t _prepare_body_for_store(store_t *store, mcl_size_t max_http_p
     mcl_size_t remaining_size;
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("store_t *store = <%p>, mcl_size_t max_http_payload_size = <%lu>, char *boundary = <%p>, mcl_uint8_t **body = <%p>, mcl_size_t *body_size = <%p>", store, max_http_payload_size, boundary, body, body_size);
+    MCL_DEBUG_ENTRY("store_t *store = <%p>, mcl_size_t max_http_payload_size = <%lu>, char *boundary = <%p>, mcl_uint8_t **body = <%p>, "\
+        "mcl_size_t *body_size = <%p>", store, max_http_payload_size, boundary, body, body_size);
 
     *body_size = 0;
     remaining_size = _select_store_items_to_exchange(store, max_http_payload_size);
@@ -941,7 +880,8 @@ static mcl_error_t _prepare_body(mcl_item_t *item, mcl_size_t max_http_payload_s
 {
     mcl_error_t code = MCL_OK;
 
-    MCL_DEBUG_ENTRY("mcl_item_t *item = <%p>, mcl_size_t max_http_payload_size = <%lu>, char *boundary = <%p>, mcl_uint8_t **body = <%p>, mcl_size_t *body_size = <%lu>", item, max_http_payload_size, boundary, body, body_size);
+    MCL_DEBUG_ENTRY("mcl_item_t *item = <%p>, mcl_size_t max_http_payload_size = <%lu>, char *boundary = <%p>, mcl_uint8_t **body = <%p>, "\
+        "mcl_size_t *body_size = <%lu>", item, max_http_payload_size, boundary, body, body_size);
 
     if (MCL_ITEM_TYPE_STORE == item->type)
     {
@@ -1059,14 +999,16 @@ static mcl_error_t _add_custom_data_to_buffer(char *buffer, mcl_size_t *buffer_s
     mcl_error_t code;
     custom_data_callback_user_context user_context;
 
-    MCL_DEBUG_ENTRY("char *buffer = <%p>, mcl_size_t *buffer_size = <%p>, custom_data_t *custom_data = <%p>, const char *boundary = <%p>", buffer, buffer_size, custom_data, boundary);
+    MCL_DEBUG_ENTRY("char *buffer = <%p>, mcl_size_t *buffer_size = <%p>, custom_data_t *custom_data = <%p>, const char *boundary = <%p>",
+        buffer, buffer_size, custom_data, boundary);
 
     // Set user context.
     user_context.custom_data = custom_data;
     user_context.offset = 0;
 
     // Add custom data to http_request.
-    code = multipart_add_tuple_with_callback(buffer, buffer_size, custom_data, boundary, custom_data->payload->content_type, _custom_data_payload_callback, &user_context);
+    code = multipart_add_tuple_with_callback(buffer, buffer_size, custom_data, boundary,
+        custom_data->payload->content_type, _custom_data_payload_callback, &user_context);
 
     MCL_DEBUG_LEAVE("retVal = <%d>", code);
     return code;

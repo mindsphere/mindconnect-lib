@@ -58,7 +58,8 @@ mcl_error_t security_initialize(void)
 
 mcl_error_t security_hash_sha256(const mcl_uint8_t *data, mcl_size_t data_size, mcl_uint8_t **hash, mcl_size_t *hash_size)
 {
-    MCL_DEBUG_ENTRY("const mcl_uint8_t *data = <%p>, mcl_size_t data_size = <%u>, mcl_uint8_t **hash = <%p>, mcl_size_t *hash_size = <%p>", data, data_size, hash, hash_size);
+    MCL_DEBUG_ENTRY("const mcl_uint8_t *data = <%p>, mcl_size_t data_size = <%u>, mcl_uint8_t **hash = <%p>, mcl_size_t *hash_size = <%p>",
+        data, data_size, hash, hash_size);
 
     // Set hash size to zero.
     *hash_size = 0;
@@ -89,8 +90,8 @@ mcl_error_t security_rsa_sign(char *rsa_key, char *data, mcl_size_t data_size, m
     mcl_size_t length;
     BIO *bio;
 
-    MCL_DEBUG_ENTRY("char *rsa_key = <%p>, char *data = <%p>, mcl_size_t data_size = <%u>, mcl_uint8_t **signature = <%p>, mcl_size_t *signature_size = <%p>", rsa_key, data,
-                    data_size, signature, signature_size);
+    MCL_DEBUG_ENTRY("char *rsa_key = <%p>, char *data = <%p>, mcl_size_t data_size = <%u>, mcl_uint8_t **signature = <%p>, mcl_size_t *signature_size = <%p>",
+        rsa_key, data, data_size, signature, signature_size);
 
     length = string_util_strlen(rsa_key);
     bio = BIO_new_mem_buf(rsa_key, (int) length);

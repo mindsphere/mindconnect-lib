@@ -127,7 +127,8 @@ mcl_error_t multipart_add_tuple(char *buffer, mcl_size_t *buffer_size, void *ite
     return code;
 }
 
-mcl_error_t multipart_add_tuple_with_callback(char *buffer, mcl_size_t *buffer_size, void *item, const char *boundary, const char *payload_content_type, multipart_add_payload_callback callback, void *user_context)
+mcl_error_t multipart_add_tuple_with_callback(char *buffer, mcl_size_t *buffer_size, void *item, const char *boundary, const char *payload_content_type,
+    multipart_add_payload_callback callback, void *user_context)
 {
     mcl_error_t code;
     char *sub_boundary = MCL_NULL;
@@ -135,7 +136,8 @@ mcl_error_t multipart_add_tuple_with_callback(char *buffer, mcl_size_t *buffer_s
     mcl_size_t remaining_size = *buffer_size;
     E_MULTIPART_STATE multipart_state = MULTIPART_STATE_OPEN_MAIN_BOUNDARY;
 
-    MCL_DEBUG_ENTRY("char *buffer = <%p>, void *item = <%p>, const char *boundary = <%p>, const char *payload_content_type = <%p>, multipart_add_payload_callback callback = <%p>, void *user_context = <%p>", buffer, item, boundary, payload_content_type, callback, user_context);
+    MCL_DEBUG_ENTRY("char *buffer = <%p>, void *item = <%p>, const char *boundary = <%p>, const char *payload_content_type = <%p>, "\
+        "multipart_add_payload_callback callback = <%p>, void *user_context = <%p>", buffer, item, boundary, payload_content_type, callback, user_context);
 
     code = multipart_generate_boundary(&sub_boundary);
 

@@ -38,7 +38,6 @@ extern "C"
 typedef enum E_MCL_CONNECTIVITY_RETURN_CODE
 {
     MCL_FILE_CANNOT_BE_OPENED = MCL_CORE_RETURN_CODE_END,   //!< File can not be opened.
-    MCL_TOO_MANY_REQUESTS,                                  //!< If the response of server is HTTP 429.
     MCL_ITEM_EXCEEDS_MAX_HTTP_REQUEST_SIZE,                 //!< Item exceeds max http payload request.
     MCL_STORE_IS_EMPTY,                                     //!< The store trying to be exchanged has no data inside.
     MCL_CONNECTIVITY_RETURN_CODE_END                        //!< End of return codes.

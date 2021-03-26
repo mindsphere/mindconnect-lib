@@ -1,0 +1,8 @@
+:cmock:
+  :plugins: [ignore, return_thru_ptr, expect_any_args]
+  :includes: ${CMOCK_YML_INCLUDES}
+  :mock_path: '${CMAKE_CURRENT_BINARY_DIR}/mock'
+  :mock_prefix: mock_
+  :framework: unity
+  :verbosity: 3
+  :treat_externs: :include

@@ -32,6 +32,7 @@
  * <li>#MCL_SHA256_CALCULATION_FAIL if SHA256 calculation fails.</li>
  * </ul>
  */
-MCL_LOCAL mcl_error_t hmac_sha256(const mcl_uint8_t *data, mcl_size_t data_size, const mcl_uint8_t *key, mcl_size_t key_size, mcl_uint8_t **hash, mcl_size_t *hash_size);
+MCL_LOCAL mcl_error_t hmac_sha256(const mcl_uint8_t *data, mcl_size_t data_size, const mcl_uint8_t *key, mcl_size_t key_size,
+    mcl_uint8_t **hash, mcl_size_t *hash_size);
 
 #endif //HMAC_H_

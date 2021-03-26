@@ -25,7 +25,6 @@
   "AES128-SHA256:AES256-SHA256:AES128-GCM-SHA256:AES256-GCM-SHA384:"\
   "ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:"
 
-// Curl CURLOPT_INFILESIZE accepts long argument and CURLOPT_INFILESIZE_LARGE accepts curl_off_t (long long) argument.
 // 2GB is the limit for CURLOPT_INFILESIZE.
 #define CURL_2GB_LIMIT 0x80000000UL
 
@@ -57,6 +56,9 @@ static mcl_size_t _response_header_callback(void *received_data, mcl_size_t size
 static mcl_size_t _request_payload_callback_for_put(char *buffer, mcl_size_t size, mcl_size_t count, void *user_context);
 static mcl_bool_t _is_empty_line(char *line);
 static struct curl_slist *_set_request_options(CURL *curl, mcl_http_request_t *http_request, default_callback_user_context_t *user_context);
+static struct curl_slist *_set_payload_options(CURL *curl, mcl_http_request_t *http_request, default_callback_user_context_t *user_context,
+    struct curl_slist *header_list);
+static void _set_in_file_size(CURL *curl, mcl_size_t payload_size);
 static mcl_error_t _convert_to_mcl_return_code(CURLcode curl_code);
 static void _header_list_destroy_callback(void **item);
 static void _certificate_list_destroy_callback(mcl_certificate_t **certificate);
@@ -223,7 +225,8 @@ mcl_error_t mcl_http_client_add_certificate(mcl_http_client_t *http_client, cons
     mcl_certificate_t *certificate_item = MCL_NULL;
     mcl_error_t code = MCL_OK;
 
-    MCL_DEBUG_ENTRY("mcl_http_client_t *http_client = <%p>, const char *certificate = <%p>, mcl_bool_t certificate_is_file = <%u>", http_client, certificate, is_file);
+    MCL_DEBUG_ENTRY("mcl_http_client_t *http_client = <%p>, const char *certificate = <%p>, mcl_bool_t certificate_is_file = <%u>",
+        http_client, certificate, is_file);
 
     MCL_ASSERT_NOT_NULL(http_client, code);
     MCL_ASSERT_NOT_NULL(certificate, code);
@@ -285,7 +288,8 @@ mcl_error_t mcl_http_client_send(mcl_http_client_t *http_client, mcl_http_reques
     // default_callback_user_context will be used only for PUT requests without user callback function.
     default_callback_user_context_t default_callback_user_context;
 
-    MCL_DEBUG_ENTRY("mcl_http_client_t *http_client = <%p>, mcl_http_request_t *http_request = <%p>, mcl_http_response_t **http_response = <%p>", http_client, http_request, http_response);
+    MCL_DEBUG_ENTRY("mcl_http_client_t *http_client = <%p>, mcl_http_request_t *http_request = <%p>, mcl_http_response_t **http_response = <%p>",
+        http_client, http_request, http_response);
 
     // Set request options. If there are no request headers, this function returns null but the other options for the request are set anyway.
     request_header_list = _set_request_options(http_client->curl, http_request, &default_callback_user_context);
@@ -330,7 +334,8 @@ mcl_error_t mcl_http_client_send(mcl_http_client_t *http_client, mcl_http_reques
         // Gather response into http_response object.
         curl_easy_getinfo(http_client->curl, CURLINFO_RESPONSE_CODE, &response_code);
 
-        return_code = mcl_http_response_initialize(response_header, response_payload->data, response_payload->size, (E_MCL_HTTP_STATUS_CODE)response_code, http_response);
+        return_code = mcl_http_response_initialize(response_header, response_payload->data, response_payload->size,
+            (E_MCL_HTTP_STATUS_CODE) response_code, http_response);
     }
 
     if (MCL_OK != return_code)
@@ -489,7 +494,8 @@ static mcl_size_t _response_payload_callback(void *received_data, mcl_size_t siz
     mcl_size_t received_data_size = size * count;
     libcurl_payload_t *payload = (libcurl_payload_t *) response_payload;
 
-    MCL_DEBUG_ENTRY("void *received_data = <%p>, mcl_size_t size = <%u>, mcl_size_t count = <%u>, void *response_payload = <%p>", received_data, size, count, response_payload);
+    MCL_DEBUG_ENTRY("void *received_data = <%p>, mcl_size_t size = <%u>, mcl_size_t count = <%u>, void *response_payload = <%p>",
+        received_data, size, count, response_payload);
 
     if (payload->data)
     {
@@ -519,7 +525,8 @@ static mcl_size_t _response_header_callback(void *received_data, mcl_size_t size
     char *header_line = MCL_NULL;
     mcl_size_t received_data_size = size * count;
 
-    MCL_DEBUG_ENTRY("void *received_data = <%p>, mcl_size_t size = <%u>, mcl_size_t count = <%u>, void *response_header = <%p>", received_data, size, count, response_header);
+    MCL_DEBUG_ENTRY("void *received_data = <%p>, mcl_size_t size = <%u>, mcl_size_t count = <%u>, void *response_header = <%p>",
+        received_data, size, count, response_header);
 
     // Eliminate empty line.
     if ((CRLF_LENGTH == received_data_size) && (MCL_TRUE == _is_empty_line((char *) received_data)))
@@ -602,7 +609,8 @@ static struct curl_slist *_set_request_options(CURL *curl, mcl_http_request_t *h
     char *request_header_line = MCL_NULL;
     mcl_size_t index;
 
-    MCL_DEBUG_ENTRY("CURL *curl = <%p>, http_request_t *http_request = <%p>,  default_callback_user_context_t *user_context = <%p>", curl, http_request, user_context);
+    MCL_DEBUG_ENTRY("CURL *curl = <%p>, mcl_http_request_t *http_request = <%p>,  default_callback_user_context_t *user_context = <%p>",
+        curl, http_request, user_context);
 
     // Set the URL to use in the request.
     // Reminder: Request URI is an absolute path including the host name.
@@ -612,6 +620,7 @@ static struct curl_slist *_set_request_options(CURL *curl, mcl_http_request_t *h
     curl_easy_setopt(curl, CURLOPT_HTTPGET, 0);
     curl_easy_setopt(curl, CURLOPT_POST, 0);
     curl_easy_setopt(curl, CURLOPT_UPLOAD, 0);
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, MCL_NULL);
 
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
     curl_easy_setopt(curl, CURLOPT_INFILESIZE, -1);
@@ -646,51 +655,14 @@ static struct curl_slist *_set_request_options(CURL *curl, mcl_http_request_t *h
             break;
 
         case MCL_HTTP_PUT :
-
             curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
+            request_header_list = _set_payload_options(curl, http_request, user_context, request_header_list);
+            break;
 
-            if (MCL_NULL == http_request->stream_callback)
-            {
-                // Set user context parameters.
-                user_context->http_request = http_request;
-                user_context->callback_offset = 0;
-
-                // Set curl callback and user context.
-                curl_easy_setopt(curl, CURLOPT_READFUNCTION, _request_payload_callback_for_put);
-                curl_easy_setopt(curl, CURLOPT_READDATA, user_context);
-
-                if (http_request->payload_size < CURL_2GB_LIMIT)
-                {
-                    curl_easy_setopt(curl, CURLOPT_INFILESIZE, (long) http_request->payload_size);
-                }
-                else
-                {
-                    curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t) http_request->payload_size);
-                }
-            }
-            else
-            {
-                curl_easy_setopt(curl, CURLOPT_READFUNCTION, http_request->stream_callback);
-                curl_easy_setopt(curl, CURLOPT_READDATA, http_request->stream_data);
-
-                if (0 == http_request->payload_size)
-                {
-                    // Transfer-Encoding: chunked.
-                    request_header_list = curl_slist_append(request_header_list, http_header_names[HTTP_HEADER_TRANSFER_ENCODING_CHUNKED]);
-                }
-                else
-                {
-                    if (http_request->payload_size < CURL_2GB_LIMIT)
-                    {
-                        curl_easy_setopt(curl, CURLOPT_INFILESIZE, (long) http_request->payload_size);
-                    }
-                    else
-                    {
-                        curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t) http_request->payload_size);
-                    }
-                }
-            }
-
+        case MCL_HTTP_PATCH:
+            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PATCH");
+            curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
+            request_header_list = _set_payload_options(curl, http_request, user_context, request_header_list);
             break;
 
         default :
@@ -717,6 +689,63 @@ static struct curl_slist *_set_request_options(CURL *curl, mcl_http_request_t *h
 
     MCL_DEBUG_LEAVE("retVal = <%p>", request_header_list);
     return request_header_list;
+}
+
+// This functions set options related to the payload of the request and updates the request header list if necessary.
+static struct curl_slist *_set_payload_options(CURL *curl, mcl_http_request_t *http_request, default_callback_user_context_t *user_context,
+    struct curl_slist *header_list)
+{
+    struct curl_slist *new_header_list = MCL_NULL;
+
+    MCL_DEBUG_ENTRY("CURL *curl = <%p>, mcl_http_request_t *http_request = <%p>, default_callback_user_context_t *user_context = <%p>, "\
+        "struct curl_slist *header_list = <%p>", curl, http_request, user_context, header_list);
+
+    if (MCL_NULL == http_request->stream_callback)
+    {
+        // Set user context parameters.
+        user_context->http_request = http_request;
+        user_context->callback_offset = 0;
+
+        // Set curl callback and user context.
+        curl_easy_setopt(curl, CURLOPT_READFUNCTION, _request_payload_callback_for_put);
+        curl_easy_setopt(curl, CURLOPT_READDATA, user_context);
+
+        _set_in_file_size(curl, http_request->payload_size);
+    }
+    else
+    {
+        curl_easy_setopt(curl, CURLOPT_READFUNCTION, http_request->stream_callback);
+        curl_easy_setopt(curl, CURLOPT_READDATA, http_request->stream_data);
+
+        if (0 == http_request->payload_size)
+        {
+            // Transfer-Encoding: chunked.
+            new_header_list = curl_slist_append(header_list, http_header_names[HTTP_HEADER_TRANSFER_ENCODING_CHUNKED]);
+        }
+        else
+        {
+            _set_in_file_size(curl, http_request->payload_size);
+        }
+    }
+
+    MCL_DEBUG_LEAVE("retVal = <%p>", new_header_list);
+    return new_header_list;
+}
+
+static void _set_in_file_size(CURL *curl, mcl_size_t payload_size)
+{
+    MCL_DEBUG_ENTRY("CURL *curl = <%p>, mcl_size_t payload_size = <%u>", curl, payload_size);
+
+    if (payload_size < CURL_2GB_LIMIT)
+    {
+        curl_easy_setopt(curl, CURLOPT_INFILESIZE, (long) payload_size);
+    }
+    else
+    {
+        curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t) payload_size);
+    }
+
+    MCL_DEBUG_LEAVE("retVal = void");
 }
 
 #if MCL_LOG_ENABLED_COMPILE_TIME(MCL_LOG_LEVEL_DEBUG)

@@ -61,7 +61,8 @@ mcl_error_t mcl_core_onboard(mcl_core_t *core)
     // Null check.
     MCL_ASSERT_NOT_NULL(core, result);
 
-    critical_section_callbacks_are_used = (MCL_NULL != core->configuration->critical_section_enter_callback) && (MCL_NULL != core->configuration->critical_section_leave_callback);
+    critical_section_callbacks_are_used = (MCL_NULL != core->configuration->critical_section_enter_callback) &&
+        (MCL_NULL != core->configuration->critical_section_leave_callback);
     if (MCL_FALSE != critical_section_callbacks_are_used)
     {
         result = core->configuration->critical_section_enter_callback();
@@ -107,7 +108,8 @@ mcl_error_t mcl_core_rotate_key(mcl_core_t *core)
     // Null check.
     MCL_ASSERT_NOT_NULL(core, result);
 
-    critical_section_callbacks_are_used = (MCL_NULL != core->configuration->critical_section_enter_callback) && (MCL_NULL != core->configuration->critical_section_leave_callback);
+    critical_section_callbacks_are_used = (MCL_NULL != core->configuration->critical_section_enter_callback) &&
+        (MCL_NULL != core->configuration->critical_section_leave_callback);
     if (MCL_FALSE != critical_section_callbacks_are_used)
     {
         result = core->configuration->critical_section_enter_callback();
@@ -154,15 +156,16 @@ mcl_error_t mcl_core_update_credentials(mcl_core_t *core)
     // Null check.
     MCL_ASSERT_NOT_NULL(core, result);
 
-    critical_section_callbacks_are_used = (MCL_NULL != core->configuration->critical_section_enter_callback) && (MCL_NULL != core->configuration->critical_section_leave_callback);
-    if (critical_section_callbacks_are_used)
+    critical_section_callbacks_are_used = (MCL_NULL != core->configuration->critical_section_enter_callback) &&
+        (MCL_NULL != core->configuration->critical_section_leave_callback);
+    if (MCL_TRUE == critical_section_callbacks_are_used)
     {
         result = core->configuration->critical_section_enter_callback();
         MCL_ASSERT_OK(result);
     }
 
     // Check if the agent is onboarded.
-    if (mcl_core_is_onboarded(core))
+    if (MCL_TRUE == mcl_core_is_onboarded(core))
     {
         // Update credentials.
         result = core_processor_update_credentials(core->core_processor);
@@ -172,7 +175,7 @@ mcl_error_t mcl_core_update_credentials(mcl_core_t *core)
         result = MCL_NOT_ONBOARDED;
     }
 
-    if (critical_section_callbacks_are_used)
+    if (MCL_TRUE == critical_section_callbacks_are_used)
     {
         core->configuration->critical_section_leave_callback();
     }

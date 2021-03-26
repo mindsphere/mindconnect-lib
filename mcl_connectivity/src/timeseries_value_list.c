@@ -46,11 +46,13 @@ MCL_FUNCTION_LEAVE_LABEL:
     return code;
 }
 
-mcl_error_t mcl_timeseries_value_list_set_parameter(mcl_timeseries_value_list_t *timeseries_value_list, E_MCL_TIMESERIES_VALUE_LIST_PARAMETER parameter, const void *value)
+mcl_error_t mcl_timeseries_value_list_set_parameter(mcl_timeseries_value_list_t *timeseries_value_list,
+    E_MCL_TIMESERIES_VALUE_LIST_PARAMETER parameter, const void *value)
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("mcl_timeseries_value_list_t *timeseries_value_list = <%p>, E_MCL_TIMESERIES_VALUE_LIST_PARAMETER parameter = <%d>, const void *value = <%p>", timeseries_value_list, parameter, value);
+    MCL_DEBUG_ENTRY("mcl_timeseries_value_list_t *timeseries_value_list = <%p>, E_MCL_TIMESERIES_VALUE_LIST_PARAMETER parameter = <%d>, "\
+        "const void *value = <%p>", timeseries_value_list, parameter, value);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(timeseries_value_list, code);
@@ -131,7 +133,8 @@ mcl_error_t mcl_timeseries_value_list_add_value(mcl_timeseries_value_list_t *tim
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("mcl_timeseries_value_list_t *timeseries_value_list = <%p>, mcl_timeseries_value_t *timeseries_value = <%p>", timeseries_value_list, timeseries_value);
+    MCL_DEBUG_ENTRY("mcl_timeseries_value_list_t *timeseries_value_list = <%p>, mcl_timeseries_value_t *timeseries_value = <%p>",
+        timeseries_value_list, timeseries_value);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(timeseries_value_list, code);

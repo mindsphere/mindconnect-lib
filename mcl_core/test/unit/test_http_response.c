@@ -232,3 +232,68 @@ void test_get_header_005()
     mcl_error_t code = mcl_http_response_get_header(&http_response, "dummy header name", MCL_NULL);
     TEST_ASSERT_EQUAL_MESSAGE(MCL_TRIGGERED_WITH_NULL, code, "mcl_http_response_get_header() failed");
 }
+
+/**
+ * GIVEN : Http response.
+ * WHEN  : mcl_http_response_get_status() is called.
+ * THEN  : Equivalent error code is returned.
+ */
+void test_get_status_001()
+{
+    mcl_http_response_t http_response;
+
+    mcl_error_t code = mcl_http_response_get_status(MCL_NULL);
+    TEST_ASSERT_EQUAL(MCL_TRIGGERED_WITH_NULL, code);
+
+    http_response.status_code = MCL_HTTP_STATUS_CODE_SUCCESS;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_OK, code);
+
+    http_response.status_code = MCL_HTTP_STATUS_CODE_CREATED;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_CREATED, code);
+
+    http_response.status_code = MCL_HTTP_STATUS_CODE_PARTIAL_CONTENT;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_PARTIAL_CONTENT, code);
+
+    http_response.status_code = MCL_HTTP_STATUS_CODE_BAD_REQUEST;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_BAD_REQUEST, code);
+
+    http_response.status_code = MCL_HTTP_STATUS_CODE_UNAUTHORIZED;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_UNAUTHORIZED, code);
+
+    http_response.status_code = MCL_HTTP_STATUS_CODE_FORBIDDEN;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_FORBIDDEN, code);
+
+    http_response.status_code = MCL_HTTP_STATUS_CODE_NOT_FOUND;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_NOT_FOUND, code);
+
+    http_response.status_code = MCL_HTTP_STATUS_CODE_CONFLICT;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_CONFLICT, code);
+
+    http_response.status_code = MCL_HTTP_STATUS_CODE_PRECONDITION_FAILED;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_PRECONDITION_FAIL, code);
+
+    http_response.status_code = MCL_HTTP_STATUS_CODE_PAYLOAD_TOO_LARGE;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_REQUEST_PAYLOAD_TOO_LARGE, code);
+
+    http_response.status_code = MCL_HTTP_RESULT_CODE_TOO_MANY_REQUESTS;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_TOO_MANY_REQUESTS, code);
+
+    http_response.status_code = MCL_HTTP_STATUS_CODE_INTERNAL_SERVER_ERR;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_SERVER_FAIL, code);
+
+    http_response.status_code = MCL_HTTP_STATUS_CODE_NOT_IMPLEMENTED;
+    code = mcl_http_response_get_status(&http_response);
+    TEST_ASSERT_EQUAL(MCL_UNEXPECTED_RESULT_CODE, code);
+}

@@ -29,7 +29,8 @@
 #define ITEM_META_BASE_SIZE (sizeof("{\"type\":\""ITEM_TYPE"\",\"version\":\""ITEM_VERSION"\",\"payload\":}") - MCL_NULL_CHAR_SIZE)
 
 // {"type":"standardTimeSeries","version":"1.0","details":{"configurationId":"<configuration_id>"}}
-#define ITEM_TIMESERIES_META_PAYLOAD_BASE_SIZE (sizeof("{\"type\":\"standardTimeSeries\",\"version\":\"\",\"details\":{\"configurationId\":\"\"}}") - MCL_NULL_CHAR_SIZE)
+#define ITEM_TIMESERIES_META_PAYLOAD_BASE_SIZE \
+    (sizeof("{\"type\":\"standardTimeSeries\",\"version\":\"\",\"details\":{\"configurationId\":\"\"}}") - MCL_NULL_CHAR_SIZE)
 
 // {"dataPointId":"<data_point_id>","value":"<value>","qualityCode":"<quality_code>"}
 #define ITEM_TIMESERIES_VALUE_BASE_SIZE (sizeof("{\"dataPointId\":\"\",\"value\":\"\",\"qualityCode\":\"\"}") - MCL_NULL_CHAR_SIZE)
@@ -41,7 +42,8 @@
 #define ITEM_EVENT_META_PAYLOAD_BASE_SIZE (sizeof("{\"type\":\"businessEvent\",\"version\":\"\"}") - MCL_NULL_CHAR_SIZE)
 
 // {"id":"<id>","timestamp":"<timestamp>","severity":<severity>,"type":"<type>","version":"<version>","details":<details_json>}
-#define ITEM_EVENT_PAYLOAD_BASE_SIZE (sizeof("{\"id\":\"\",\"timestamp\":\"\",\"severity\":,\"type\":\"\",\"version\":\"\",\"details\":}") + MCL_TIMESTAMP_LENGTH - 2 * MCL_NULL_CHAR_SIZE)
+#define ITEM_EVENT_PAYLOAD_BASE_SIZE \
+    (sizeof("{\"id\":\"\",\"timestamp\":\"\",\"severity\":,\"type\":\"\",\"version\":\"\",\"details\":}") + MCL_TIMESTAMP_LENGTH - 2 * MCL_NULL_CHAR_SIZE)
 
 // Correlation ID is optional for event.
 #define ITEM_EVENT_PAYLOAD_CORRELATION_ID_SIZE (sizeof(",\"correlationId\":\"\"") - MCL_NULL_CHAR_SIZE)
@@ -50,7 +52,8 @@
 #define ITEM_EVENT_PAYLOAD_DESCRIPTION_SIZE (sizeof(",\"description\":\"\"") - MCL_NULL_CHAR_SIZE)
 
 // {"type":"file","version":"1.0","details":{"fileName":"<fileName>","creationDate":"<creationDate>"}}
-#define ITEM_FILE_META_PAYLOAD_BASE_SIZE (sizeof("{\"type\":\"file\",\"version\":\"\",\"details\":{\"fileName\":\"\",\"creationDate\":\"\"}}") + MCL_TIMESTAMP_LENGTH - 2 * MCL_NULL_CHAR_SIZE)
+#define ITEM_FILE_META_PAYLOAD_BASE_SIZE \
+    (sizeof("{\"type\":\"file\",\"version\":\"\",\"details\":{\"fileName\":\"\",\"creationDate\":\"\"}}") + MCL_TIMESTAMP_LENGTH - 2 * MCL_NULL_CHAR_SIZE)
 
 // File type is optional for file meta payload.
 #define ITEM_FILE_META_PAYLOAD_FILE_TYPE_SIZE (sizeof(",\"fileType\":\"\"") - MCL_NULL_CHAR_SIZE)
@@ -239,7 +242,8 @@ typedef mcl_error_t (*json_parser_callback)(mcl_json_t *json, void **any_struct)
 static mcl_error_t _fill_array_using_list(mcl_json_t *json_array, mcl_list_t *list, json_converter_callback callback);
 
 // Fill list of structures using json array.
-static mcl_error_t _fill_list_using_json_array(mcl_json_t *json_array, json_parser_callback parser_callback, mcl_list_item_destroy_callback destroy_callback, mcl_list_t *list);
+static mcl_error_t _fill_list_using_json_array(mcl_json_t *json_array, json_parser_callback parser_callback,
+    mcl_list_item_destroy_callback destroy_callback, mcl_list_t *list);
 
 // Add item meta payload to root json.
 static mcl_error_t _add_item_meta_payload(mcl_item_t *item, mcl_json_t *root);
@@ -744,7 +748,8 @@ static mcl_error_t _json_from_data_source_configuration_payload(data_source_conf
         // Fill data sources array.
         if (MCL_OK == code)
         {
-            code = _fill_array_using_list(data_sources_array, data_source_configuration->payload->data_sources, (json_converter_callback)_json_from_data_source);
+            code = _fill_array_using_list(data_sources_array, data_source_configuration->payload->data_sources,
+                (json_converter_callback)_json_from_data_source);
         }
     }
 
@@ -1403,13 +1408,15 @@ static mcl_error_t _add_item_meta_payload_file_details(file_t *file, mcl_json_t 
     return code;
 }
 
-static mcl_error_t _fill_list_using_json_array(mcl_json_t *json_array, json_parser_callback parser_callback, mcl_list_item_destroy_callback destroy_callback, mcl_list_t *list)
+static mcl_error_t _fill_list_using_json_array(mcl_json_t *json_array, json_parser_callback parser_callback,
+    mcl_list_item_destroy_callback destroy_callback, mcl_list_t *list)
 {
     mcl_error_t code;
     mcl_size_t index;
     mcl_size_t array_size;
 
-    MCL_DEBUG_ENTRY("mcl_json_t *json_array = <%p>, json_parser_callback callback = <%p>, mcl_list_item_destroy_callback destroy_callback = <%p>, mcl_list_t *list = <%p>", json_array, parser_callback, destroy_callback, list);
+    MCL_DEBUG_ENTRY("mcl_json_t *json_array = <%p>, json_parser_callback callback = <%p>, mcl_list_item_destroy_callback destroy_callback = <%p>, "\
+        "mcl_list_t *list = <%p>", json_array, parser_callback, destroy_callback, list);
 
     // Get array size.
     code = mcl_json_util_get_array_size(json_array, &array_size);
@@ -1564,7 +1571,8 @@ static mcl_error_t _parse_data_source(mcl_json_t *json, data_source_t **data_sou
 
         if (MCL_OK == code)
         {
-            code = _fill_list_using_json_array(data_point_array, (json_parser_callback) _parse_data_point, (mcl_list_item_destroy_callback) mcl_data_point_destroy, (*data_source)->data_points);
+            code = _fill_list_using_json_array(data_point_array, (json_parser_callback) _parse_data_point,
+                (mcl_list_item_destroy_callback) mcl_data_point_destroy, (*data_source)->data_points);
         }
     }
 
@@ -1588,7 +1596,8 @@ static mcl_error_t _parse_data_source_configuration(mcl_json_t *json, data_sourc
     // Parse configuration id.
     if (MCL_OK == code)
     {
-        code = _parse_and_get_string_value(json, payload_field_names[PAYLOAD_FIELD_CONFIGURATION_ID], &((*data_source_configuration)->payload->configuration_id));
+        code = _parse_and_get_string_value(json, payload_field_names[PAYLOAD_FIELD_CONFIGURATION_ID],
+            &((*data_source_configuration)->payload->configuration_id));
     }
 
     // Parse data sources.
@@ -1600,7 +1609,8 @@ static mcl_error_t _parse_data_source_configuration(mcl_json_t *json, data_sourc
 
         if (MCL_OK == code)
         {
-            code = _fill_list_using_json_array(data_point_array, (json_parser_callback) _parse_data_source, (mcl_list_item_destroy_callback) mcl_data_source_destroy, (*data_source_configuration)->payload->data_sources);
+            code = _fill_list_using_json_array(data_point_array, (json_parser_callback) _parse_data_source,
+                (mcl_list_item_destroy_callback) mcl_data_source_destroy, (*data_source_configuration)->payload->data_sources);
         }
     }
 

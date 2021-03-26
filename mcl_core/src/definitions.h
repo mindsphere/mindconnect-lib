@@ -13,8 +13,6 @@
 
 #define NONCE_SIZE 16
 
-// TODO: version size assumed 36 instead of 255 like in document and DEFAULT_ID_SIZE is used. Change later after deciding.
-// These sizes come from "Interface Specification MindConnect API V 0.1". Sizes increased by 1 for null termination.
 #define DEFAULT_META_TYPE_SIZE                  6
 #define DEFAULT_PAYLOAD_TYPE_SIZE               20
 #define DEFAULT_QUALITY_CODE_SIZE               9

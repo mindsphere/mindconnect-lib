@@ -94,7 +94,8 @@ mcl_error_t base64_decode(const char *encoded_data, mcl_uint8_t **decoded_data, 
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("const char *encoded_data = <%p>, mcl_uint8_t **decoded_data = <%p>, mcl_size_t *decoded_data_size = <%p>", encoded_data, decoded_data, decoded_data_size);
+    MCL_DEBUG_ENTRY("const char *encoded_data = <%p>, mcl_uint8_t **decoded_data = <%p>, mcl_size_t *decoded_data_size = <%p>",
+        encoded_data, decoded_data, decoded_data_size);
 
     code = _decode_with_table(base64_decode_table, encoded_data, decoded_data, decoded_data_size);
 
@@ -106,7 +107,8 @@ mcl_error_t base64_url_decode(const char *encoded_data, mcl_uint8_t **decoded_da
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("const char *encoded_data = <%p>, mcl_uint8_t **decoded_data = <%p>, mcl_size_t *decoded_data_size = <%p>", encoded_data, decoded_data, decoded_data_size);
+    MCL_DEBUG_ENTRY("const char *encoded_data = <%p>, mcl_uint8_t **decoded_data = <%p>, mcl_size_t *decoded_data_size = <%p>",
+        encoded_data, decoded_data, decoded_data_size);
 
     code = _decode_with_table(base64_url_decode_table, encoded_data, decoded_data, decoded_data_size);
 
@@ -147,7 +149,8 @@ static mcl_error_t _decode_with_table(const mcl_uint8_t *table, const char *enco
     mcl_size_t encoded_data_length;
     const char *encoded_position = encoded_data;
 
-    MCL_DEBUG_ENTRY("const mcl_uint8_t *table = <%p>, const char *encoded_data = <%p>, mcl_uint8_t **decoded_data = <%p>, mcl_size_t *decoded_data_size = <%p>", table, encoded_data, decoded_data, decoded_data_size);
+    MCL_DEBUG_ENTRY("const mcl_uint8_t *table = <%p>, const char *encoded_data = <%p>, mcl_uint8_t **decoded_data = <%p>, mcl_size_t *decoded_data_size = <%p>",
+        table, encoded_data, decoded_data, decoded_data_size);
 
     *decoded_data = MCL_NULL;
     *decoded_data_size = 0;
@@ -302,7 +305,8 @@ static mcl_error_t _encode_with_table(const char *table, const mcl_uint8_t *data
     mcl_size_t buffer_size;
     mcl_uint8_t remainder;
 
-    MCL_DEBUG_ENTRY("const char *table = <%p>, const mcl_uint8_t *data = <%p>, mcl_size_t data_size = <%u>, char **encoded_data = <%p>", table, data, data_size, encoded_data);
+    MCL_DEBUG_ENTRY("const char *table = <%p>, const mcl_uint8_t *data = <%p>, mcl_size_t data_size = <%u>, char **encoded_data = <%p>",
+        table, data, data_size, encoded_data);
 
     iteration_count = data_size / INPUT_GROUP_SIZE;
     remainder = data_size % INPUT_GROUP_SIZE;

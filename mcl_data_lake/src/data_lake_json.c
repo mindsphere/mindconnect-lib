@@ -33,13 +33,15 @@ static const char subtenant_id_key[] = ",\"subtenantId\":\"";
 static mcl_size_t _calculate_total_path_size(data_lake_object_t **object_array, mcl_size_t array_size, mcl_size_t *valid_path_count);
 
 // Find matching object and set signed url.
-static mcl_error_t _find_matching_object(mcl_json_t *object_url_item, data_lake_object_t **object_array, mcl_size_t array_size, char *object_path, mcl_size_t compare_size);
+static mcl_error_t _find_matching_object(mcl_json_t *object_url_item, data_lake_object_t **object_array, mcl_size_t array_size,
+    const char *object_path, mcl_size_t compare_size);
 
 // Function to check if there is any object with path but without signed url.
 static mcl_error_t _check_signed_urls(data_lake_object_t **object_array, mcl_size_t array_size);
 
 // Function to calculate body size for request to generate upload urls.
-static mcl_size_t _data_lake_json_get_body_size_generate_upload_urls(data_lake_object_t **object_array, mcl_size_t array_size, mcl_size_t client_id_length, mcl_size_t subtenant_id_length);
+static mcl_size_t _data_lake_json_get_body_size_generate_upload_urls(data_lake_object_t **object_array,
+    mcl_size_t array_size, mcl_size_t client_id_length, mcl_size_t subtenant_id_length);
 
 mcl_error_t data_lake_json_from_objects(data_lake_object_t **object_array, mcl_size_t array_size, const char *client_id, const char *subtenant_id, char **json)
 {
@@ -51,7 +53,8 @@ mcl_error_t data_lake_json_from_objects(data_lake_object_t **object_array, mcl_s
     mcl_size_t body_size;
     char *position = MCL_NULL;
 
-    MCL_DEBUG_ENTRY("data_lake_object_t *object_array = <%p>, mcl_size_t array_size = <%lu>, const char *client_id = <%p>, const char *subtenant_id = <%p>, char **json = <%p>", object_array, array_size, client_id, subtenant_id, json);
+    MCL_DEBUG_ENTRY("data_lake_object_t *object_array = <%p>, mcl_size_t array_size = <%lu>, const char *client_id = <%p>, "\
+        "const char *subtenant_id = <%p>, char **json = <%p>", object_array, array_size, client_id, subtenant_id, json);
 
     client_id_length = mcl_string_util_strlen(client_id);
 
@@ -150,7 +153,8 @@ mcl_error_t data_lake_json_from_objects(data_lake_object_t **object_array, mcl_s
     return code;
 }
 
-mcl_error_t data_lake_json_match_signed_urls_with_objects(data_lake_object_t **object_array, mcl_size_t array_size, char *json, mcl_size_t json_size, mcl_size_t client_id_length)
+mcl_error_t data_lake_json_match_signed_urls_with_objects(data_lake_object_t **object_array, mcl_size_t array_size, char *json,
+    mcl_size_t json_size, mcl_size_t client_id_length)
 {
     mcl_error_t code = MCL_OK;
     mcl_size_t index;
@@ -159,7 +163,8 @@ mcl_error_t data_lake_json_match_signed_urls_with_objects(data_lake_object_t **o
     mcl_json_t *object_urls_array = MCL_NULL;
     mcl_size_t path_overhead_length = client_id_length + SLASH_LENGTH;
 
-    MCL_DEBUG_ENTRY("data_lake_object_t **object_array = <%p>, mcl_size_t array_size = <%lu>, char *json = <%p>, mcl_size_t json_size = <%lu>, mcl_size_t client_id_length = <%lu>", object_array, array_size, json, json_size, client_id_length);
+    MCL_DEBUG_ENTRY("data_lake_object_t **object_array = <%p>, mcl_size_t array_size = <%lu>, char *json = <%p>, "\
+        "mcl_size_t json_size = <%lu>, mcl_size_t client_id_length = <%lu>", object_array, array_size, json, json_size, client_id_length);
 
     if (0 == json_size)
     {
@@ -211,7 +216,8 @@ mcl_error_t data_lake_json_match_signed_urls_with_objects(data_lake_object_t **o
             if (object_path_length > path_overhead_length)
             {
                 // Adding MCL_NULL_CHAR_SIZE to compare with null character.
-                _find_matching_object(object_url_item, object_array, array_size, object_path + path_overhead_length, (object_path_length - path_overhead_length) + MCL_NULL_CHAR_SIZE);
+                _find_matching_object(object_url_item, object_array, array_size, object_path + path_overhead_length,
+                    (object_path_length - path_overhead_length) + MCL_NULL_CHAR_SIZE);
             }
             else
             {
@@ -241,7 +247,8 @@ static mcl_size_t _calculate_total_path_size(data_lake_object_t **object_array, 
     mcl_size_t index;
     *valid_path_count = 0;
 
-    MCL_DEBUG_ENTRY("data_lake_object_array **object_array = <%p>, mcl_size_t array_size = <%lu>, mcl_size_t *valid_path_count = <%p>", object_array, array_size, valid_path_count);
+    MCL_DEBUG_ENTRY("data_lake_object_array **object_array = <%p>, mcl_size_t array_size = <%lu>, mcl_size_t *valid_path_count = <%p>",
+        object_array, array_size, valid_path_count);
 
     for (index = 0; index < array_size; ++index)
     {
@@ -260,7 +267,8 @@ static mcl_size_t _calculate_total_path_size(data_lake_object_t **object_array, 
     return total_path_size;
 }
 
-static mcl_error_t _find_matching_object(mcl_json_t *object_url_item, data_lake_object_t **object_array, mcl_size_t array_size, char *object_path, mcl_size_t compare_size)
+static mcl_error_t _find_matching_object(mcl_json_t *object_url_item, data_lake_object_t **object_array, mcl_size_t array_size,
+    const char *object_path, mcl_size_t compare_size)
 {
     mcl_size_t object_array_index;
     mcl_error_t code = MCL_OK;
@@ -317,14 +325,16 @@ static mcl_error_t _check_signed_urls(data_lake_object_t **object_array, mcl_siz
     return code;
 }
 
-static mcl_size_t _data_lake_json_get_body_size_generate_upload_urls(data_lake_object_t **object_array, mcl_size_t array_size, mcl_size_t client_id_length, mcl_size_t subtenant_id_length)
+static mcl_size_t _data_lake_json_get_body_size_generate_upload_urls(data_lake_object_t **object_array, mcl_size_t array_size,
+    mcl_size_t client_id_length, mcl_size_t subtenant_id_length)
 {
     mcl_size_t total_path_length;
     mcl_size_t valid_path_count;
     mcl_size_t path_overhead_length;
     mcl_size_t body_size;
 
-    MCL_DEBUG_ENTRY("data_lake_object_t **object_array = <%p>, mcl_size_t array_size = <%lu>, mcl_size_t client_id_length = <%lu>, mcl_size_t subtenant_id_length = <%lu>", object_array, array_size, client_id_length, subtenant_id_length);
+    MCL_DEBUG_ENTRY("data_lake_object_t **object_array = <%p>, mcl_size_t array_size = <%lu>, mcl_size_t client_id_length = <%lu>, "\
+        "mcl_size_t subtenant_id_length = <%lu>", object_array, array_size, client_id_length, subtenant_id_length);
 
     total_path_length = _calculate_total_path_size(object_array, array_size, &valid_path_count);
 

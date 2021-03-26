@@ -14,12 +14,13 @@
 
 static void _free_string(char **header);
 
-mcl_error_t mcl_http_response_initialize(mcl_list_t *header, mcl_uint8_t *payload, mcl_size_t payload_size, E_MCL_HTTP_STATUS_CODE status_code, mcl_http_response_t **http_response)
+mcl_error_t mcl_http_response_initialize(mcl_list_t *header, mcl_uint8_t *payload, mcl_size_t payload_size, E_MCL_HTTP_STATUS_CODE status_code,
+    mcl_http_response_t **http_response)
 {
     mcl_error_t result = MCL_OK;
 
-    MCL_DEBUG_ENTRY("mcl_list_t *header = <%p>, mcl_uint8_t *payload = <%p>, mcl_size_t payload_size = <%u>, E_MCL_HTTP_STATUS_CODE status_code = <%d>, mcl_http_response_t **http_response = <%p>",
-        header, payload, payload_size, status_code, http_response);
+    MCL_DEBUG_ENTRY("mcl_list_t *header = <%p>, mcl_uint8_t *payload = <%p>, mcl_size_t payload_size = <%u>, E_MCL_HTTP_STATUS_CODE status_code = <%d>, "\
+        "mcl_http_response_t **http_response = <%p>", header, payload, payload_size, status_code, http_response);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(header, result);
@@ -44,7 +45,8 @@ mcl_error_t mcl_http_response_get_header(mcl_http_response_t *http_response, con
 {
     mcl_error_t result = MCL_FAIL;
 
-    MCL_DEBUG_ENTRY("mcl_http_response_t *http_response = <%p>, char *header_name = <%s>, char **header_value = <%p>", http_response, header_name, header_value);
+    MCL_DEBUG_ENTRY("mcl_http_response_t *http_response = <%p>, char *header_name = <%s>, char **header_value = <%p>",
+        http_response, header_name, header_value);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(http_response, result);
@@ -98,6 +100,75 @@ mcl_error_t mcl_http_response_get_header(mcl_http_response_t *http_response, con
 MCL_FUNCTION_LEAVE_LABEL:
     MCL_DEBUG_LEAVE("retVal = <%d>", result);
     return result;
+}
+
+mcl_error_t mcl_http_response_get_status(mcl_http_response_t *http_response)
+{
+    mcl_error_t code;
+
+    MCL_DEBUG_ENTRY("mcl_http_response_t *http_response = <%p>", http_response);
+
+    MCL_ASSERT_NOT_NULL(http_response, code);
+
+    switch (http_response->status_code)
+    {
+        case MCL_HTTP_STATUS_CODE_SUCCESS:
+            code = MCL_OK;
+            break;
+
+        case MCL_HTTP_STATUS_CODE_CREATED:
+            code = MCL_CREATED;
+            break;
+
+        case MCL_HTTP_STATUS_CODE_PARTIAL_CONTENT:
+            code = MCL_PARTIAL_CONTENT;
+            break;
+
+        case MCL_HTTP_STATUS_CODE_BAD_REQUEST:
+            code = MCL_BAD_REQUEST;
+            break;
+
+        case MCL_HTTP_STATUS_CODE_UNAUTHORIZED:
+            code = MCL_UNAUTHORIZED;
+            break;
+
+        case MCL_HTTP_STATUS_CODE_FORBIDDEN:
+            code = MCL_FORBIDDEN;
+            break;
+
+        case MCL_HTTP_STATUS_CODE_NOT_FOUND:
+            code = MCL_NOT_FOUND;
+            break;
+
+        case MCL_HTTP_STATUS_CODE_CONFLICT:
+            code = MCL_CONFLICT;
+            break;
+
+        case MCL_HTTP_STATUS_CODE_PRECONDITION_FAILED:
+            code = MCL_PRECONDITION_FAIL;
+            break;
+
+        case MCL_HTTP_STATUS_CODE_PAYLOAD_TOO_LARGE:
+            code = MCL_REQUEST_PAYLOAD_TOO_LARGE;
+            break;
+
+        case MCL_HTTP_RESULT_CODE_TOO_MANY_REQUESTS:
+            code = MCL_TOO_MANY_REQUESTS;
+            break;
+
+        case MCL_HTTP_STATUS_CODE_INTERNAL_SERVER_ERR:
+            code = MCL_SERVER_FAIL;
+            break;
+
+        default:
+            code = MCL_UNEXPECTED_RESULT_CODE;
+            MCL_INFO("Server responded with unexpected HTTP status code %d.", http_response->status_code);
+            break;
+    }
+
+MCL_FUNCTION_LEAVE_LABEL:
+    MCL_DEBUG_LEAVE("retVal = <%d>", code);
+    return code;
 }
 
 void mcl_http_response_destroy(mcl_http_response_t **http_response)
