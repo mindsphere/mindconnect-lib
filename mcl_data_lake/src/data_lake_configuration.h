@@ -16,7 +16,7 @@
  */
 typedef struct mcl_data_lake_configuration_t
 {
-    mcl_core_t *core;  
+    mcl_core_t *core;
     char *upload_url_generation_url;
     char *certificate;
     mcl_bool_t certificate_is_file;

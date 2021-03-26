@@ -62,8 +62,8 @@ MCL_LOCAL mcl_error_t multipart_add_tuple(char *buffer, mcl_size_t *buffer_size,
  * <li>#MCL_FAIL in case of an internal error in MCL.</li>
  * </ul>
  */
-MCL_LOCAL mcl_error_t multipart_add_tuple_with_callback(char *buffer, mcl_size_t *buffer_size, void *item, const char *boundary, const char *payload_content_type,
-    multipart_add_payload_callback callback, void *user_context);
+MCL_LOCAL mcl_error_t multipart_add_tuple_with_callback(char *buffer, mcl_size_t *buffer_size, void *item, const char *boundary,
+    const char *payload_content_type, multipart_add_payload_callback callback, void *user_context);
 
 /**
  * This function calculates the tuple size of an item.

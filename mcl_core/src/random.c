@@ -95,9 +95,12 @@ mcl_error_t random_generate_guid(char **guid)
         guid_content.guid_fields.clk_seq_hi_res = (guid_content.guid_fields.clk_seq_hi_res & 0x3FU) | 0x80U;
         guid_content.guid_fields.time_hi_and_version = (guid_content.guid_fields.time_hi_and_version & 0x0FFFU) | 0x4000U;
 
-        code = string_util_snprintf(guid_string, GUID_LENGTH + 1, "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x", guid_content.guid_fields.time_low, guid_content.guid_fields.time_mid,
-                                    guid_content.guid_fields.time_hi_and_version, guid_content.guid_fields.clk_seq_hi_res, guid_content.guid_fields.clk_seq_low, guid_content.guid_fields.node[0], guid_content.guid_fields.node[1],
-                                    guid_content.guid_fields.node[2], guid_content.guid_fields.node[3], guid_content.guid_fields.node[4], guid_content.guid_fields.node[5]);
+        code = string_util_snprintf(guid_string, GUID_LENGTH + 1, "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+                                    guid_content.guid_fields.time_low, guid_content.guid_fields.time_mid, guid_content.guid_fields.time_hi_and_version,
+                                    guid_content.guid_fields.clk_seq_hi_res, guid_content.guid_fields.clk_seq_low,
+                                    guid_content.guid_fields.node[0], guid_content.guid_fields.node[1],
+                                    guid_content.guid_fields.node[2], guid_content.guid_fields.node[3],
+                                    guid_content.guid_fields.node[4], guid_content.guid_fields.node[5]);
         MCL_ASSERT_STATEMENT_CODE_MESSAGE(MCL_OK == code, MCL_FREE(guid_string), code, "GUID structure can not be printed as string.");
 
         *guid = guid_string;

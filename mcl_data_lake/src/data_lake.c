@@ -53,7 +53,7 @@ mcl_error_t mcl_data_lake_initialize(mcl_data_lake_configuration_t *configuratio
             if (MCL_NULL != configuration->certificate)
             {
                 code = mcl_http_client_add_certificate((*data_lake)->processor.http_client, configuration->certificate, configuration->certificate_is_file);
-            } 
+            }
         }
     }
 

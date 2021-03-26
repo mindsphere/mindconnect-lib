@@ -32,7 +32,8 @@ mcl_error_t mcl_event_initialize(E_MCL_EVENT_VERSION version, mcl_event_t **even
     MCL_ASSERT_NOT_NULL(event, code);
 
     // Check meta version parameter.
-    MCL_ASSERT_CODE_MESSAGE(MCL_EVENT_VERSION_1_0 <= version && MCL_EVENT_VERSION_END > version, MCL_INVALID_PARAMETER, "Invalid meta payload version parameter.");
+    MCL_ASSERT_CODE_MESSAGE(MCL_EVENT_VERSION_1_0 <= version && MCL_EVENT_VERSION_END > version, MCL_INVALID_PARAMETER,
+        "Invalid meta payload version parameter.");
 
     // Allocate memory for event.
     if (MCL_NULL != MCL_NEW(*event))
@@ -100,7 +101,8 @@ mcl_error_t mcl_event_set_parameter(mcl_event_t *event, E_MCL_EVENT_PARAMETER pa
         case MCL_EVENT_PARAMETER_SEVERITY:
 
             // Validate payload severity parameter.
-            MCL_ASSERT_CODE_MESSAGE(MCL_EVENT_SEVERITY_ERROR <= *(mcl_int32_t *) (value) && MCL_EVENT_SEVERITY_END > *(mcl_int32_t *) (value), MCL_INVALID_PARAMETER, "Invalid severity value.");
+            MCL_ASSERT_CODE_MESSAGE(MCL_EVENT_SEVERITY_ERROR <= *(mcl_int32_t *) (value) &&
+                MCL_EVENT_SEVERITY_END > *(mcl_int32_t *) (value), MCL_INVALID_PARAMETER, "Invalid severity value.");
 
             event->payload->severity = _event_severity_values[event->item_base.version][*((E_MCL_EVENT_SEVERITY*) value)];
             code = MCL_OK;
@@ -129,7 +131,8 @@ mcl_error_t mcl_event_set_parameter(mcl_event_t *event, E_MCL_EVENT_PARAMETER pa
 
             // Check length of description value. Max 255 is allowed.
             description_length = mcl_string_util_strlen(value);
-            MCL_ASSERT_CODE_MESSAGE((MCL_EVENT_PARAMETER_DESCRIPTION_MAXIMUM_LENGTH > description_length), MCL_INVALID_PARAMETER, "Length of description is not less than 256 characters." );
+            MCL_ASSERT_CODE_MESSAGE((MCL_EVENT_PARAMETER_DESCRIPTION_MAXIMUM_LENGTH > description_length), MCL_INVALID_PARAMETER,
+                "Length of description is not less than 256 characters." );
 
             code = mcl_string_util_reset(value, &event->payload->description);
             break;
@@ -154,7 +157,7 @@ MCL_FUNCTION_LEAVE_LABEL:
 
 mcl_error_t event_validate(event_t *event)
 {
-    mcl_error_t code = MCL_OK;
+    mcl_error_t code;
 
     MCL_DEBUG_ENTRY("event_t *event = <%p>", event);
 
@@ -170,6 +173,10 @@ mcl_error_t event_validate(event_t *event)
     else if (MCL_NULL == event->payload->version)
     {
         code = MCL_INVALID_PARAMETER;
+    }
+    else
+    {
+        code = MCL_OK;
     }
 
     MCL_DEBUG_LEAVE("retVal = <%d>", code);

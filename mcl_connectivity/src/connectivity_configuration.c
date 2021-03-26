@@ -47,11 +47,13 @@ MCL_FUNCTION_LEAVE_LABEL:
     return code;
 }
 
-mcl_error_t mcl_connectivity_configuration_set_parameter(mcl_connectivity_configuration_t *configuration, E_MCL_CONNECTIVITY_CONFIGURATION_PARAMETER parameter, const void *value)
+mcl_error_t mcl_connectivity_configuration_set_parameter(mcl_connectivity_configuration_t *configuration,
+    E_MCL_CONNECTIVITY_CONFIGURATION_PARAMETER parameter, const void *value)
 {
     mcl_error_t code = MCL_OK;
 
-    MCL_DEBUG_ENTRY("mcl_connectivity_configuration_t *configuration = <%p>, E_MCL_CONNECTIVITY_CONFIGURATION_PARAMETER parameter = <%d>, const void *value = <%p>", configuration, parameter, value);
+    MCL_DEBUG_ENTRY("mcl_connectivity_configuration_t *configuration = <%p>, E_MCL_CONNECTIVITY_CONFIGURATION_PARAMETER parameter = <%d>, "\
+        "const void *value = <%p>", configuration, parameter, value);
 
     MCL_ASSERT_NOT_NULL(configuration, code);
     MCL_ASSERT_NOT_NULL(value, code);
@@ -64,7 +66,8 @@ mcl_error_t mcl_connectivity_configuration_set_parameter(mcl_connectivity_config
 
         case MCL_CONNECTIVITY_CONFIGURATION_PARAMETER_MAX_HTTP_PAYLOAD_SIZE:
 
-            if ((MCL_CONNECTIVITY_MIN_HTTP_PAYLOAD_SIZE <= *((const mcl_size_t *) value)) && (MCL_CONNECTIVITY_MAX_HTTP_PAYLOAD_SIZE >= *((const mcl_size_t *) value)))
+            if ((MCL_CONNECTIVITY_MIN_HTTP_PAYLOAD_SIZE <= *((const mcl_size_t *) value)) &&
+                (MCL_CONNECTIVITY_MAX_HTTP_PAYLOAD_SIZE >= *((const mcl_size_t *) value)))
             {
                 configuration->max_http_payload_size = *((const mcl_size_t *) value);
             }

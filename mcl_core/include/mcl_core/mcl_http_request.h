@@ -33,6 +33,7 @@ typedef enum E_MCL_HTTP_METHOD
     MCL_HTTP_POST,      //!< Http post method.
     MCL_HTTP_PUT,       //!< Http put method.
     MCL_HTTP_DELETE,    //!< Http delete method.
+    MCL_HTTP_PATCH,     //!< Http patch method.
     MCL_HTTP_CONNECT,   //!< Http connect method.
     MCL_HTTP_OPTIONS,   //!< Http options method.
     MCL_HTTP_TRACE,     //!< Http trace method.

@@ -57,7 +57,7 @@ mcl_error_t mcl_file_util_fopen_without_log(const char *file_name, const char *m
         return_code = MCL_FAIL;
     }
 
-    return return_code; 
+    return return_code;
 #else
     return MCL_FAIL;
 #endif
@@ -105,7 +105,8 @@ mcl_error_t mcl_file_util_fwrite(const void *data, mcl_size_t size, mcl_size_t c
 #if HAVE_FILE_SYSTEM_
     mcl_error_t return_code;
 
-    MCL_DEBUG_ENTRY("const void *data = <%p>, mcl_size_t size = <%u>, mcl_size_t count = <%u>, void *file_descriptor = <%p>", data, size, count, file_descriptor);
+    MCL_DEBUG_ENTRY("const void *data = <%p>, mcl_size_t size = <%u>, mcl_size_t count = <%u>, void *file_descriptor = <%p>",
+        data, size, count, file_descriptor);
 
     return_code = mcl_file_util_fwrite_without_log(data, size, count, file_descriptor);
 
@@ -141,8 +142,8 @@ mcl_error_t mcl_file_util_fwrite_without_log(const void *data, mcl_size_t size, 
 void mcl_file_util_fread(void *data, mcl_size_t size, mcl_size_t count, void *file_descriptor, mcl_size_t *actual_count)
 {
 #if HAVE_FILE_SYSTEM_
-    MCL_DEBUG_ENTRY("void *data = <%p>, mcl_size_t size = <%u>, mcl_size_t count = <%u>, void *file_descriptor = <%p>, mcl_size_t *actual_count = <%p>", data, size, count,
-                file_descriptor, actual_count);
+    MCL_DEBUG_ENTRY("void *data = <%p>, mcl_size_t size = <%u>, mcl_size_t count = <%u>, void *file_descriptor = <%p>, mcl_size_t *actual_count = <%p>",
+        data, size, count, file_descriptor, actual_count);
 
     *actual_count = fread(data, size, count, (FILE *)file_descriptor);
 

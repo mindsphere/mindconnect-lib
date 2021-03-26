@@ -47,11 +47,13 @@ MCL_FUNCTION_LEAVE_LABEL:
     return code;
 }
 
-mcl_error_t mcl_data_lake_configuration_set_parameter(mcl_data_lake_configuration_t *configuration, E_MCL_DATA_LAKE_CONFIGURATION_PARAMETER parameter, const void *value)
+mcl_error_t mcl_data_lake_configuration_set_parameter(mcl_data_lake_configuration_t *configuration,
+    E_MCL_DATA_LAKE_CONFIGURATION_PARAMETER parameter, const void *value)
 {
     mcl_error_t code = MCL_OK;
 
-    MCL_DEBUG_ENTRY("mcl_data_lake_configuration_t *configuration = <%p>, E_MCL_DATA_LAKE_CONFIGURATION_PARAMETER parameter = <%d>, const void *value = <%p>", configuration, parameter, value);
+    MCL_DEBUG_ENTRY("mcl_data_lake_configuration_t *configuration = <%p>, E_MCL_DATA_LAKE_CONFIGURATION_PARAMETER parameter = <%d>, const void *value = <%p>",
+        configuration, parameter, value);
 
     MCL_ASSERT_NOT_NULL(configuration, code);
     MCL_ASSERT_NOT_NULL(value, code);
@@ -145,7 +147,8 @@ static mcl_error_t _set_data_lake_configuration_core_parameter(mcl_data_lake_con
         {
             // Concatenate host name with the constant endpoint for data lake upload url.
             mcl_string_util_memcpy(configuration->upload_url_generation_url, hostname, hostname_length);
-            mcl_string_util_memcpy(configuration->upload_url_generation_url + hostname_length, _upload_url_generation_endpoint, sizeof(_upload_url_generation_endpoint));
+            mcl_string_util_memcpy(configuration->upload_url_generation_url + hostname_length, _upload_url_generation_endpoint,
+                sizeof(_upload_url_generation_endpoint));
         }
     }
     else

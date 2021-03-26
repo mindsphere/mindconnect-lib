@@ -23,7 +23,8 @@ mcl_error_t mcl_timeseries_initialize(E_MCL_TIMESERIES_VERSION version, mcl_time
     MCL_ASSERT_NOT_NULL(timeseries, code);
 
     // Check meta version parameter.
-    MCL_ASSERT_CODE_MESSAGE(MCL_TIMESERIES_VERSION_1_0 <= version && MCL_TIMESERIES_VERSION_END > version, MCL_INVALID_PARAMETER, "Invalid meta payload version parameter.");
+    MCL_ASSERT_CODE_MESSAGE(MCL_TIMESERIES_VERSION_1_0 <= version && MCL_TIMESERIES_VERSION_END > version, MCL_INVALID_PARAMETER,
+        "Invalid meta payload version parameter.");
 
     // Allocate memory for timeseries.
     if (MCL_NULL != MCL_NEW(*timeseries))

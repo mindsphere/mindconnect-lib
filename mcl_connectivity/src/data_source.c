@@ -52,7 +52,8 @@ mcl_error_t mcl_data_source_set_parameter(mcl_data_source_t *data_source, E_MCL_
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("mcl_data_source_t *data_source = <%p>, E_MCL_DATA_SOURCE_PARAMETER parameter = <%d>, const void *value = <%p>", data_source, parameter, value);
+    MCL_DEBUG_ENTRY("mcl_data_source_t *data_source = <%p>, E_MCL_DATA_SOURCE_PARAMETER parameter = <%d>, const void *value = <%p>",
+        data_source, parameter, value);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(data_source, code);

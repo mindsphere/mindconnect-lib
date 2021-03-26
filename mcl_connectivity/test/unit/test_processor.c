@@ -1000,6 +1000,7 @@ void test_get_data_source_configuration_002()
     http_response->status_code = MCL_HTTP_STATUS_CODE_NOT_FOUND;
     mcl_http_client_send_ExpectAnyArgsAndReturn(MCL_OK);
     mcl_http_client_send_ReturnThruPtr_http_response(&http_response);
+    mcl_http_response_get_status_ExpectAnyArgsAndReturn(MCL_NOT_FOUND);
 
     // Mock destroy functions.
     mcl_http_request_destroy_Ignore();

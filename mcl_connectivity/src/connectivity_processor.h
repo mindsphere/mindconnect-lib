@@ -129,7 +129,8 @@ MCL_LOCAL mcl_error_t connectivity_processor_create_mapping(connectivity_process
  * <li>#MCL_FAIL in case of an internal error in MCL.</li>
  * </ul>
  */
-MCL_LOCAL mcl_error_t connectivity_processor_get_data_source_configuration(connectivity_processor_t *connectivity_processor, data_source_configuration_t **configuration);
+MCL_LOCAL mcl_error_t connectivity_processor_get_data_source_configuration(connectivity_processor_t *connectivity_processor,
+    data_source_configuration_t **configuration);
 
 /**
  * This function destroys connectivity processor data structure.

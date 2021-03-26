@@ -161,6 +161,7 @@ void test_generate_upload_url_002(void)
     mcl_http_client_send_ExpectAndReturn(&dummy_client, ptr_dummy_request, MCL_NULL, MCL_OK);
     mcl_http_client_send_IgnoreArg_http_response();
     mcl_http_client_send_ReturnThruPtr_http_response(&ptr_dummy_response);
+    mcl_http_response_get_status_ExpectAnyArgsAndReturn(MCL_BAD_REQUEST);
 
     // HTTP request and response should be destroyed.
     mcl_http_request_destroy_Ignore();
@@ -540,6 +541,7 @@ void test_upload_002(void)
     http_response->payload = NULL;
     mcl_http_client_send_ExpectAnyArgsAndReturn(MCL_OK);
     mcl_http_client_send_ReturnThruPtr_http_response(&http_response);
+    mcl_http_response_get_status_ExpectAnyArgsAndReturn(MCL_BAD_REQUEST);
 
     // HTTP request and response should be destroyed.
     mcl_http_request_destroy_Ignore();

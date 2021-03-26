@@ -28,7 +28,8 @@ mcl_error_t mcl_file_initialize(E_MCL_FILE_VERSION version, mcl_file_t **file)
     MCL_ASSERT_NOT_NULL(file, code);
 
     // Check meta version parameter.
-    MCL_ASSERT_CODE_MESSAGE(MCL_FILE_VERSION_1_0 <= version && MCL_FILE_VERSION_END > version, MCL_INVALID_PARAMETER, "Invalid meta payload version parameter.");
+    MCL_ASSERT_CODE_MESSAGE(MCL_FILE_VERSION_1_0 <= version && MCL_FILE_VERSION_END > version, MCL_INVALID_PARAMETER,
+        "Invalid meta payload version parameter.");
 
     // Allocate memory for file.
     if (MCL_NULL != MCL_NEW(*file))

@@ -34,8 +34,8 @@ mcl_error_t hmac_sha256(const mcl_uint8_t *data, mcl_size_t data_size, const mcl
     // If the key is too long, replace it by its hash sha256.
     mcl_uint8_t *key_resized = MCL_NULL;
 
-    MCL_DEBUG_ENTRY("const mcl_uint8_t *data = <%p>, mcl_size_t data_size = <%u>, const mcl_uint8_t *key = <%p>, mcl_size_t key_size = <%u>, mcl_uint8_t **hash = <%p>, mcl_size_t *hash_size = <%p>",
-                data, data_size, key, key_size, hash, hash_size);
+    MCL_DEBUG_ENTRY("const mcl_uint8_t *data = <%p>, mcl_size_t data_size = <%u>, const mcl_uint8_t *key = <%p>, mcl_size_t key_size = <%u>, "\
+        "mcl_uint8_t **hash = <%p>, mcl_size_t *hash_size = <%p>", data, data_size, key, key_size, hash, hash_size);
 
     MCL_ASSERT_CODE_MESSAGE(key_size > 0, MCL_INVALID_PARAMETER, "Size of key for HMAC must be greater than 0!");
 
@@ -44,8 +44,8 @@ mcl_error_t hmac_sha256(const mcl_uint8_t *data, mcl_size_t data_size, const mcl
         MCL_DEBUG("Resizing given key to its SHA256 value.");
 
         code = security_hash_sha256(key, key_size, &key_resized, &key_local_size);
-        MCL_ASSERT_CODE_MESSAGE(MCL_OK == code, code, "Given HMAC key size = <%u> was greater than allowed = <%u>, but new key couldn't be constructed from its SHA256 hash!",
-                            key_size, HMAC_MAXIMUM_KEY_SIZE);
+        MCL_ASSERT_CODE_MESSAGE(MCL_OK == code, code, "Given HMAC key size = <%u> was greater than allowed = <%u>, "\
+            "but new key couldn't be constructed from its SHA256 hash!", key_size, HMAC_MAXIMUM_KEY_SIZE);
         MCL_ASSERT_STATEMENT_CODE_MESSAGE(HMAC_SHA256_SIZE == key_local_size, MCL_FREE(key_resized), MCL_SHA256_CALCULATION_FAIL,
                                       "SHA256 didn't returned expected length of data = <%u>!", HMAC_SHA256_SIZE);
         key_local = key_resized;

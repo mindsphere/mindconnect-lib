@@ -267,7 +267,7 @@ MCL_LOCAL mcl_error_t json_util_get_bool_value(mcl_json_t *json, mcl_bool_t *boo
  * This function gets the string value of a given json object.
  *
  * @param [in] json Json object to get the value.
- * @param [out] string_value String value of @p json. New memory space will be allocated for this parameter. Ownership passed to caller. Caller must free the space.
+ * @param [out] string_value String value of @p json.
  * @return
  * <ul>
  * <li>#MCL_OK in case of success.</li>

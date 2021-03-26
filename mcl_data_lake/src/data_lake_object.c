@@ -45,7 +45,8 @@ mcl_error_t mcl_data_lake_object_set_parameter(mcl_data_lake_object_t *object, E
 {
     mcl_error_t code = MCL_OK;
 
-    MCL_DEBUG_ENTRY("mcl_data_lake_object_t *object = <%p>, E_MCL_DATA_LAKE_OBJECT_PARAMETER parameter = <%d>, const void *value = <%p>", object, parameter, value);
+    MCL_DEBUG_ENTRY("mcl_data_lake_object_t *object = <%p>, E_MCL_DATA_LAKE_OBJECT_PARAMETER parameter = <%d>, const void *value = <%p>",
+        object, parameter, value);
 
     MCL_ASSERT_NOT_NULL(object, code);
     MCL_ASSERT_NOT_NULL(value, code);
@@ -82,8 +83,9 @@ mcl_error_t data_lake_object_set_internal_parameter(mcl_data_lake_object_t *obje
 {
     mcl_error_t code = MCL_OK;
 
-    MCL_DEBUG_ENTRY("mcl_data_lake_object_t *object = <%p>, E_DATA_LAKE_OBJECT_INTERNAL_PARAMETER parameter = <%p>, const void *value = <%p>", object, &parameter, value);
-    
+    MCL_DEBUG_ENTRY("mcl_data_lake_object_t *object = <%p>, E_DATA_LAKE_OBJECT_INTERNAL_PARAMETER parameter = <%p>, const void *value = <%p>",
+        object, &parameter, value);
+
     if (DATA_LAKE_OBJECT_INTERNAL_PARAMETER_SIGNED_URL == parameter)
     {
         code = mcl_string_util_reset(value, &object->signed_url);

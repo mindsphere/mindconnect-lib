@@ -102,6 +102,9 @@ OPTION(MCL_CONNECTIVITY "Option to compile connectivity extension." ON)
 # Option to compile data lake extension.
 OPTION(MCL_DATA_LAKE "Option to compile data lake extension." ON)
 
+# Option to compile deployment extension.
+OPTION(MCL_DEPLOYMENT "Option to compile deployment extension." ON)
+
 # Option to set if MCL build as static or dynamic.
 OPTION(MCL_STATICLIB "Option to build static or dynamic." OFF)
 
@@ -119,4 +122,8 @@ ENDIF()
 
 IF(MCL_DATA_LAKE)
     ADD_SUBDIRECTORY(mcl_data_lake)
+ENDIF()
+
+IF(MCL_DEPLOYMENT)
+    ADD_SUBDIRECTORY(mcl_deployment)
 ENDIF()

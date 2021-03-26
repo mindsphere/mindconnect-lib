@@ -37,7 +37,8 @@ mcl_error_t mcl_timeseries_value_set_parameter(mcl_timeseries_value_t *timeserie
 {
     mcl_error_t code;
 
-    MCL_DEBUG_ENTRY("mcl_timeseries_value_t *timeseries_value = <%p>, E_MCL_TIMESERIES_VALUE_PARAMETER parameter = <%d>, const void *value = <%p>", timeseries_value, parameter, value);
+    MCL_DEBUG_ENTRY("mcl_timeseries_value_t *timeseries_value = <%p>, E_MCL_TIMESERIES_VALUE_PARAMETER parameter = <%d>, const void *value = <%p>",
+        timeseries_value, parameter, value);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(timeseries_value, code);

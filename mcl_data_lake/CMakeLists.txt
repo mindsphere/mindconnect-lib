@@ -22,7 +22,7 @@ ELSE()
     ADD_DEFINITIONS(-DMCL_STATICLIB=0)
 ENDIF()
 
-MESSAGE(STATUS "MCL Data Lake will be build as ${MCL_USER_DEFINED_DYNAMIC_OR_STATIC} library.")
+MESSAGE(STATUS "MCL Data Lake will be built as ${MCL_USER_DEFINED_DYNAMIC_OR_STATIC} library.")
 
 # MCL Data Lake sources.
 ADD_SUBDIRECTORY(src)

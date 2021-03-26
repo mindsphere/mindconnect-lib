@@ -27,9 +27,6 @@ static const char azure_header_block_blob[] = "BlockBlob";
 // Function used to add authorization header to the request.
 static mcl_error_t _add_authorization_header(mcl_http_request_t *request, const char *access_token);
 
-// Evaluate response codes.
-static mcl_error_t _evaluate_response_codes(mcl_http_response_t *response);
-
 // Since signed URLs may not be in the same order with the request body, array may save time.
 // It also helps to implement a function which can handle both single object and multiple objects.
 static data_lake_object_t** _data_lake_object_list_to_array(mcl_list_t *object_list);
@@ -48,7 +45,8 @@ mcl_error_t data_lake_processor_generate_upload_url(data_lake_processor_t *proce
     mcl_error_t code;
     data_lake_object_t *single_object = object;
 
-    MCL_DEBUG_ENTRY("data_lake_processor_t *processor = <%p>, data_lake_object_t *object = <%p>, const char *subtenant_id = <%p>", processor, object, subtenant_id);
+    MCL_DEBUG_ENTRY("data_lake_processor_t *processor = <%p>, data_lake_object_t *object = <%p>, const char *subtenant_id = <%p>",
+        processor, object, subtenant_id);
 
     code = _generate_upload_urls(processor, &single_object, SINGLE_OBJECT_SIZE, subtenant_id);
 
@@ -61,7 +59,8 @@ mcl_error_t data_lake_processor_generate_upload_urls(data_lake_processor_t *proc
     mcl_error_t code;
     data_lake_object_t **object_array;
 
-    MCL_DEBUG_ENTRY("data_lake_processor_t *processor = <%p>, mcl_list_t *object_list = <%p>, const char *subtenant_id = <%p>", processor, object_list, subtenant_id);
+    MCL_DEBUG_ENTRY("data_lake_processor_t *processor = <%p>, mcl_list_t *object_list = <%p>, const char *subtenant_id = <%p>",
+        processor, object_list, subtenant_id);
 
     object_array = _data_lake_object_list_to_array(object_list);
 
@@ -72,7 +71,7 @@ mcl_error_t data_lake_processor_generate_upload_urls(data_lake_processor_t *proc
     else
     {
         code = _generate_upload_urls(processor, object_array, object_list->count, subtenant_id);
-    } 
+    }
 
     MCL_FREE(object_array);
 
@@ -87,7 +86,7 @@ mcl_error_t data_lake_processor_upload(data_lake_processor_t *processor, data_la
     mcl_http_request_t *request = MCL_NULL;
     mcl_http_response_t *response = MCL_NULL;
     E_MCL_HTTP_METHOD method = MCL_HTTP_PUT;
-    
+
     MCL_DEBUG_ENTRY("data_lake_processor_t *processor = <%p>, data_lake_object_t *object = <%p>", processor, object);
 
     // Validate object.
@@ -150,7 +149,7 @@ mcl_error_t data_lake_processor_upload(data_lake_processor_t *processor, data_la
         }
         else
         {
-            code = _evaluate_response_codes(response);
+            code = mcl_http_response_get_status(response);
             MCL_ERROR("HTTP %d received from server for the request.", response->status_code);
 
             if (MCL_NULL != response->payload)
@@ -206,7 +205,8 @@ static mcl_error_t _generate_upload_urls(data_lake_processor_t *processor, data_
     char *body = MCL_NULL;
     E_MCL_HTTP_METHOD method = MCL_HTTP_POST;
 
-    MCL_DEBUG_ENTRY("data_lake_processor_t *processor = <%p>, data_lake_object_t **object_array = <%p>, mcl_size_t array_size = <%lu>, const char *subtenant_id = <%p>", processor, object_array, array_size, subtenant_id);
+    MCL_DEBUG_ENTRY("data_lake_processor_t *processor = <%p>, data_lake_object_t **object_array = <%p>, mcl_size_t array_size = <%lu>, "\
+        "const char *subtenant_id = <%p>", processor, object_array, array_size, subtenant_id);
 
     // First clear signed urls.
     _clear_signed_urls(object_array, array_size);
@@ -222,7 +222,7 @@ static mcl_error_t _generate_upload_urls(data_lake_processor_t *processor, data_
     {
         code = mcl_http_request_initialize(&request);
     }
-    
+
     // Set method.
     if (MCL_OK == code)
     {
@@ -278,7 +278,7 @@ static mcl_error_t _generate_upload_urls(data_lake_processor_t *processor, data_
         }
         else
         {
-            code = _evaluate_response_codes(response);
+            code = mcl_http_response_get_status(response);
             MCL_ERROR("HTTP %d received from server for the request.", response->status_code);
 
             if (MCL_NULL != response->payload)
@@ -336,56 +336,6 @@ static data_lake_object_t** _data_lake_object_list_to_array(mcl_list_t *object_l
     return data_lake_object_array;
 }
 
-static mcl_error_t _evaluate_response_codes(mcl_http_response_t *response)
-{
-    mcl_error_t code;
-
-    MCL_DEBUG_ENTRY("mcl_http_response_t *response = <%p>", response);
-
-    switch (response->status_code)
-    {
-        case MCL_HTTP_STATUS_CODE_BAD_REQUEST:
-            code = MCL_BAD_REQUEST;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_UNAUTHORIZED:
-            code = MCL_UNAUTHORIZED;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_FORBIDDEN:
-            code = MCL_FORBIDDEN;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_NOT_FOUND:
-            code = MCL_NOT_FOUND;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_INTERNAL_SERVER_ERR:
-            code = MCL_SERVER_FAIL;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_CONFLICT:
-            code = MCL_CONFLICT;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_PRECONDITION_FAILED:
-            code = MCL_PRECONDITION_FAIL;
-            break;
-
-        case MCL_HTTP_STATUS_CODE_PAYLOAD_TOO_LARGE:
-            code = MCL_REQUEST_PAYLOAD_TOO_LARGE;
-            break;
-
-        default:
-            code = MCL_UNEXPECTED_RESULT_CODE;
-            MCL_INFO("Server responded with unexpected HTTP status code %d.", response->status_code);
-            break;
-    }
-
-    MCL_DEBUG_LEAVE("retVal = <%d>", code);
-    return code;
-}
-
 static mcl_bool_t _check_url_if_it_is_for_azure_storage(data_lake_object_t *object)
 {
     mcl_bool_t is_for_azure = MCL_FALSE;
@@ -401,7 +351,8 @@ static mcl_bool_t _check_url_if_it_is_for_azure_storage(data_lake_object_t *obje
         // Empty body.
     }
 
-    if ((index < (url_length - sizeof(azure_storage_url))) && (MCL_TRUE == mcl_string_util_memcmp(&(object->signed_url[index]), azure_storage_url, sizeof(azure_storage_url) - MCL_NULL_CHAR_SIZE)))
+    if ((index < (url_length - sizeof(azure_storage_url))) &&
+        (MCL_TRUE == mcl_string_util_memcmp(&(object->signed_url[index]), azure_storage_url, sizeof(azure_storage_url) - MCL_NULL_CHAR_SIZE)))
     {
         is_for_azure = MCL_TRUE;
     }

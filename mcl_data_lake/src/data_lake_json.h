@@ -45,6 +45,7 @@ mcl_error_t data_lake_json_from_objects(data_lake_object_t **object_array, mcl_s
  * <li>#MCL_FAIL in case of an internal error in MCL.</li>
  * </ul>
  */
-mcl_error_t data_lake_json_match_signed_urls_with_objects(data_lake_object_t **object_array, mcl_size_t array_size, char *json, mcl_size_t json_size, mcl_size_t client_id_length);
+mcl_error_t data_lake_json_match_signed_urls_with_objects(data_lake_object_t **object_array, mcl_size_t array_size, char *json,
+    mcl_size_t json_size, mcl_size_t client_id_length);
 
 #endif //DATA_LAKE_JSON_H_

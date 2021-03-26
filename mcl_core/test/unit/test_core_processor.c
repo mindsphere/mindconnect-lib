@@ -341,6 +341,7 @@ void test_register_001(void)
     http_response->payload_size = sizeof(http_response_string) - 1;
     http_response->payload = MCL_MALLOC(http_response->payload_size);
     mcl_string_util_memcpy(http_response->payload, http_response_string, sizeof(http_response_string) - 1);
+    mcl_http_response_get_status_ExpectAnyArgsAndReturn(MCL_CREATED);
 
     // Mock http client.
     mcl_http_client_send_ExpectAnyArgsAndReturn(MCL_OK);
@@ -428,6 +429,7 @@ void test_register_002(void)
     http_response->payload_size = sizeof(http_response_string) - 1;
     http_response->payload = MCL_MALLOC(http_response->payload_size);
     mcl_string_util_memcpy(http_response->payload, http_response_string, sizeof(http_response_string) - 1);
+    mcl_http_response_get_status_ExpectAnyArgsAndReturn(MCL_OK);
 
     // Mock http client.
     mcl_http_client_send_ExpectAnyArgsAndReturn(MCL_OK);
@@ -520,6 +522,7 @@ void test_register_003(void)
     http_response->payload_size = sizeof(http_response_string) - 1;
     http_response->payload = MCL_MALLOC(http_response->payload_size);
     mcl_string_util_memcpy(http_response->payload, http_response_string, sizeof(http_response_string) - 1);
+    mcl_http_response_get_status_ExpectAnyArgsAndReturn(MCL_CREATED);
 
     // Mock http client.
     mcl_http_client_send_ExpectAnyArgsAndReturn(MCL_OK);
@@ -617,6 +620,7 @@ void test_register_004(void)
     http_response->payload_size = sizeof(http_response_string) - 1;
     http_response->payload = MCL_MALLOC(http_response->payload_size);
     mcl_string_util_memcpy(http_response->payload, http_response_string, sizeof(http_response_string) - 1);
+    mcl_http_response_get_status_ExpectAnyArgsAndReturn(MCL_OK);
 
     // Mock http client.
     mcl_http_client_send_ExpectAnyArgsAndReturn(MCL_OK);
@@ -749,6 +753,7 @@ void test_register_006(void)
     http_response->payload_size = sizeof(http_response_string) - 1;
     http_response->payload = MCL_MALLOC(http_response->payload_size);
     mcl_string_util_memcpy(http_response->payload, http_response_string, sizeof(http_response_string) - 1);
+    mcl_http_response_get_status_ExpectAnyArgsAndReturn(MCL_OK);
 
     // Mock http client.
     mcl_http_client_send_ExpectAnyArgsAndReturn(MCL_OK);
@@ -985,6 +990,7 @@ void test_get_access_token_001(void)
     http_response->payload_size = sizeof(http_response_string) - 1;
     http_response->payload = MCL_MALLOC(http_response->payload_size);
     mcl_string_util_memcpy(http_response->payload, http_response_string, sizeof(http_response_string) - 1);
+    mcl_http_response_get_status_ExpectAnyArgsAndReturn(MCL_OK);
 
     // Mock http client.
     mcl_http_client_send_ExpectAnyArgsAndReturn(MCL_OK);

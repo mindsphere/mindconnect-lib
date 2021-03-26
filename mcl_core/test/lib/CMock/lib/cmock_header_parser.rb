@@ -76,6 +76,7 @@ class CMockHeaderParser
     source.gsub!(/MCL_CONNECTIVITY_EXPORT/, '')
     source.gsub!(/MCL_PUBSUB_EXPORT/, '')
     source.gsub!(/MCL_DATA_LAKE_EXPORT/, '')
+    source.gsub!(/MCL_DEPLOYMENT_EXPORT/, '')
 
     # remove preprocessor statements and extern "C"
     source.gsub!(/^\s*#.*/, '')

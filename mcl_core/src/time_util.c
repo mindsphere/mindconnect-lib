@@ -13,7 +13,8 @@
 #include "mcl_core/mcl_memory.h"
 
 // Feature test for gmtime_r.
-#define GMTIME_R_EXISTS ((defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE>= 1) || defined(_XOPEN_SOURCE) || defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(_POSIX_SOURCE))
+#define GMTIME_R_EXISTS ((defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE>= 1) || defined(_XOPEN_SOURCE) || \
+    defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(_POSIX_SOURCE))
 
 #define TIMESTAMP_FIELD_COUNT 7
 #define TIMESTAMP_DATE_INDEX 2

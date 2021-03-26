@@ -62,7 +62,8 @@ mcl_error_t mcl_custom_data_set_parameter(mcl_custom_data_t *custom_data, E_MCL_
 {
     mcl_error_t code = MCL_OK;
 
-    MCL_DEBUG_ENTRY("mcl_custom_data_t *custom_data = <%p>, E_MCL_CUSTOM_DATA_PARAMETER parameter = <%d>, const void *value = <%p>", custom_data, parameter, value);
+    MCL_DEBUG_ENTRY("mcl_custom_data_t *custom_data = <%p>, E_MCL_CUSTOM_DATA_PARAMETER parameter = <%d>, const void *value = <%p>",
+        custom_data, parameter, value);
 
     // Null check.
     MCL_ASSERT_NOT_NULL(custom_data, code);
@@ -108,7 +109,8 @@ mcl_error_t custom_data_validate(custom_data_t *custom_data)
     MCL_DEBUG_ENTRY("custom_data_t *custom_data = <%p>", custom_data);
 
     // Checks whether all mandatory parameters of a custom data are set or not.
-    if ((MCL_NULL == payload->buffer) || (MCL_NULL == payload->content_type) || (MCL_NULL == payload->type) || (MCL_NULL == payload->version) || (0 == payload->size))
+    if ((MCL_NULL == payload->buffer) || (MCL_NULL == payload->content_type) ||
+        (MCL_NULL == payload->type) || (MCL_NULL == payload->version) || (0 == payload->size))
     {
         code = MCL_INVALID_PARAMETER;
     }

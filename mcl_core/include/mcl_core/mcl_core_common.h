@@ -128,6 +128,7 @@ typedef enum E_MCL_CORE_RETURN_CODE
     MCL_CONFLICT,                           //!< If the response of server is HTTP 409.
     MCL_PRECONDITION_FAIL,                  //!< If the response of server is HTTP 412.
     MCL_REQUEST_PAYLOAD_TOO_LARGE,          //!> If the response of server is HTTP 413.
+    MCL_TOO_MANY_REQUESTS,                  //!> If the response of server is HTTP 429.
     MCL_UNEXPECTED_RESULT_CODE,             //!< If the response of server is unexpected.
 
     // Status return codes.
