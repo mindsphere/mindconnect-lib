@@ -14,7 +14,7 @@
 #include "mcl_core/mcl_string_util.h"
 #include "mcl_core/mcl_memory.h"
 
-static const char *credentials_file_name = "registrationInformationFile.txt";
+static const char *credentials_file_name = "credentials.txt";
 
 #define MAX_DIGIT_FOR_PARAMETER_LENGTH 4
 

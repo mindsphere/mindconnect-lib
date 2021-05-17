@@ -393,7 +393,7 @@ mcl_error_t core_processor_register(core_processor_t *core_processor)
         // Send the onboarding request and retrieve the response.
         if (MCL_OK != (result = mcl_http_client_send(core_processor->http_client, http_request, &http_response)))
         {
-            MCL_ERROR("HTTP request can not be sent to the server.");
+            MCL_ERROR("HTTP client error when accessing /register endpoint.");
         }
         else
         {
@@ -465,20 +465,11 @@ static mcl_error_t _process_registration_response(core_processor_t *core_process
     }
     else
     {
-        if (MCL_TRUE == is_onboard_request)
-        {
-            MCL_ERROR("Onboarding failed.");
-        }
-        else
-        {
-            MCL_ERROR("Key rotation failed.");
-        }
-
         MCL_ERROR("HTTP <%d> received from server for the request with correlation-id = \"%s\".", http_response->status_code, correlation_id);
 
         if (MCL_NULL != http_response->payload)
         {
-            MCL_ERROR("HTTP Response:\n%.*s", http_response->payload_size, http_response->payload);
+            MCL_ERROR("HTTP Response Body:\n%.*s", http_response->payload_size, http_response->payload);
         }
     }
 
@@ -717,7 +708,6 @@ mcl_error_t core_processor_get_access_token(core_processor_t *core_processor)
         }
         else
         {
-            MCL_ERROR("Getting access token failed.");
             MCL_ERROR("HTTP <%d> received from server for the request with correlation-id = \"%s\".", response->status_code, correlation_id);
 
             if (MCL_NULL != response->payload)
@@ -725,6 +715,10 @@ mcl_error_t core_processor_get_access_token(core_processor_t *core_processor)
                 MCL_ERROR("HTTP Response:\n%.*s", response->payload_size, response->payload);
             }
         }
+    }
+    else
+    {
+        MCL_ERROR("Http client error when accessing /token endpoint.");
     }
 
     MCL_FREE(correlation_id);
@@ -1181,6 +1175,10 @@ static mcl_error_t _save_credentials(core_processor_t *core_processor)
                 core_processor->security_handler->registration_access_token,
                 core_processor->security_handler->registration_uri);
         }
+    }
+    else
+    {
+        MCL_WARN("Credentials will not be saved because callback functions to load/save credentials are not provided.");
     }
 
     MCL_DEBUG_LEAVE("retVal = <%d>", result);

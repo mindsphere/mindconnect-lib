@@ -1,3 +1,9 @@
+# [4.3.1] (2021-05-15)
+
+## Bug Fixes
+
+* Cmake build related issues reported from github repository are fixed.
+
 # [4.3.0] (2021-03-27)
 
 ## Features

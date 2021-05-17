@@ -746,7 +746,7 @@ static mcl_error_t _parse_workflow_model_state_groups(mcl_json_t *json, mcl_list
 
             if (MCL_OK != code)
             {
-                deployment_workflow_model_state_destroy(&state_group);
+                deployment_workflow_model_state_group_destroy(&state_group);
             }
         }
     }

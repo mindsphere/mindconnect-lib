@@ -197,6 +197,15 @@ mcl_error_t mcl_core_get_access_token(mcl_core_t *core)
     if (MCL_TRUE == mcl_core_is_onboarded(core))
     {
         result = core_processor_get_access_token(core->core_processor);
+
+        if (MCL_OK == result)
+        {
+            MCL_INFO("Access token received.");
+        }
+        else
+        {
+            MCL_ERROR("Failed to get access token.");
+        }
     }
     else
     {
