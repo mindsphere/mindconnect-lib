@@ -1,7 +1,7 @@
-set openssl_version=1.1.1d
-set curl_version=7.65.3
+set openssl_version=1.1.1m
+set curl_version=7.81.0
 set path_to_7zip="C:\Program Files\7-Zip"
-set path_to_visual_studio="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional"
+set path_to_visual_studio="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional"
 set main_directory=..\mcl_sandbox
 set mcl_directory=%cd%
 
@@ -29,7 +29,7 @@ nmake install_sw
 cd ..
 
 cd curl-%curl_version%\winbuild
-nmake /f Makefile.vc mode=dll VC=15 WITH_SSL=dll MACHINE=x64 WITH_PREFIX=%main_directory%\install\ SSL_PATH=%main_directory%\install
+nmake /f Makefile.vc mode=dll VC=16 WITH_SSL=dll MACHINE=x64 WITH_PREFIX=%main_directory%\install\ SSL_PATH=%main_directory%\install
 cd ../..
 
 mkdir mcl_build

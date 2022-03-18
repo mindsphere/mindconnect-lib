@@ -854,7 +854,7 @@ mcl_error_t json_util_parse(const char *json_string, mcl_size_t size, mcl_json_t
     }
     else
     {
-        (*root) = cJSON_ParseWithSize(json_string, size);
+        (*root) = cJSON_ParseWithLength(json_string, size);
     }
 
     if (MCL_NULL == (*root))
