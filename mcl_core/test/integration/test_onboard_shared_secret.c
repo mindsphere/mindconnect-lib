@@ -288,7 +288,7 @@ void test_onboard_06(void)
 {
     // Variable declaration.
     mcl_error_t code;
-    const char *proxy_hostname = "bgdtgdtrgbdrtjgr.com";
+    const char *proxy_hostname = "invalid-mcl-proxy.security-int.siemens.cloud";
 
     // Set proxy hostname parameter.
     code = mcl_core_configuration_set_parameter(configuration, MCL_CORE_CONFIGURATION_PARAMETER_PROXY_HOST, proxy_hostname);
@@ -407,7 +407,7 @@ void test_onboard_10(void)
     // Variable declaration.
     mcl_error_t code;
     mcl_uint16_t proxy_port = (mcl_uint16_t)0xDEAD;
-    mcl_uint32_t http_request_timeout = 2;
+    mcl_uint32_t http_request_timeout = 20;
 
     // Set proxy port parameter.
     code = mcl_core_configuration_set_parameter(configuration, MCL_CORE_CONFIGURATION_PARAMETER_PROXY_PORT, &proxy_port);

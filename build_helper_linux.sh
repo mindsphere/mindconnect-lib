@@ -1,6 +1,6 @@
 #!/bin/bash
-openssl_version=1.1.1d
-curl_version=7.65.3
+openssl_version=1.1.1m
+curl_version=7.81.0
 main_directory=../mcl_sandbox
 mcl_directory=$(pwd)
 

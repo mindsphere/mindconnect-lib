@@ -834,6 +834,160 @@ void test_update_credentials_001(void)
 }
 
 /**
+ * GIVEN : Server failure.
+ * WHEN  : core_processor_register() is called.
+ * THEN  : MCL_SERVER_FAIL is returned.
+ */
+void test_register_007(void)
+{
+    // Mock configuration.
+    core_configuration_t *configuration = MCL_NULL;
+    _create_configuration(MCL_SECURITY_SHARED_SECRET, "InitialAccessToken", &configuration);
+
+    security_initialize_IgnoreAndReturn(MCL_OK);
+    mcl_http_client_initialize_IgnoreAndReturn(MCL_OK);
+
+    // Mock security handler.
+    security_handler_t *security_handler = NULL;
+    _create_security_handler(&security_handler);
+
+    security_handler_initialize_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_initialize_ReturnThruPtr_security_handler(&security_handler);
+
+    // Initialize core processor.
+    core_processor_t *core_processor = MCL_NULL;
+    core_processor_initialize(configuration, &core_processor);
+
+    // Mock http request.
+    mcl_http_request_t *http_request = NULL;
+    MCL_NEW(http_request);
+    http_request->header = MCL_NULL;
+    http_request->payload_size = 2;
+    http_request->payload = MCL_MALLOC(http_request->payload_size);
+    http_request->uri = MCL_NULL;
+    http_request->stream_data = MCL_NULL;
+
+    mcl_http_request_initialize_ExpectAnyArgsAndReturn(MCL_OK);
+    mcl_http_request_initialize_ReturnThruPtr_http_request(&http_request);
+    mcl_http_request_set_parameter_IgnoreAndReturn(MCL_OK);
+    mcl_http_request_add_header_IgnoreAndReturn(MCL_OK);
+
+    // Correlation-ID.
+    security_generate_random_bytes_ExpectAnyArgsAndReturn(MCL_OK);
+
+    mcl_http_request_add_header_IgnoreAndReturn(MCL_OK);
+
+    // Mock http response.
+    mcl_http_response_t *http_response;
+    char http_response_string[] = "{\"msg\":\"Server failure.\"}";
+    MCL_NEW(http_response);
+    http_response->status_code = MCL_HTTP_STATUS_CODE_INTERNAL_SERVER_ERR;
+    http_response->payload_size = sizeof(http_response_string) - 1;
+    http_response->payload = MCL_MALLOC(http_response->payload_size);
+    mcl_string_util_memcpy(http_response->payload, http_response_string, sizeof(http_response_string) - 1);
+    mcl_http_response_get_status_ExpectAnyArgsAndReturn(MCL_SERVER_FAIL);
+
+    // Mock http client.
+    mcl_http_client_send_ExpectAnyArgsAndReturn(MCL_OK);
+    mcl_http_client_send_ReturnThruPtr_http_response(&http_response);
+
+    // Mock destroy functions.
+    mcl_http_request_destroy_Ignore();
+    mcl_http_response_destroy_Ignore();
+
+    mcl_error_t code = core_processor_register(core_processor);
+    TEST_ASSERT_EQUAL(MCL_SERVER_FAIL, code);
+
+    // Clean up.
+    MCL_FREE(http_response->payload);
+    MCL_FREE(http_response);
+    MCL_FREE(http_request->payload);
+    MCL_FREE(http_request);
+    MCL_FREE(security_handler->client_id);
+    MCL_FREE(security_handler->registration_access_token);
+    MCL_FREE(security_handler->client_secret);
+    MCL_FREE(security_handler->registration_uri);
+    MCL_FREE(security_handler);
+    mcl_http_client_destroy_Ignore();
+    security_handler_destroy_Ignore();
+    core_processor_destroy(&core_processor);
+    MCL_FREE(configuration->initial_access_token);
+    MCL_FREE(configuration->mindsphere_hostname);
+    MCL_FREE(configuration);
+}
+
+/**
+ * GIVEN : Http client failure.
+ * WHEN  : core_processor_register() is called.
+ * THEN  : MCL_FAIL is returned.
+ */
+void test_register_008(void)
+{
+    mcl_error_t expected_http_client_error = MCL_FAIL;
+
+    // Mock configuration.
+    core_configuration_t *configuration = MCL_NULL;
+    _create_configuration(MCL_SECURITY_SHARED_SECRET, "InitialAccessToken", &configuration);
+
+    security_initialize_IgnoreAndReturn(MCL_OK);
+    mcl_http_client_initialize_IgnoreAndReturn(MCL_OK);
+
+    // Mock security handler.
+    security_handler_t *security_handler = NULL;
+    _create_security_handler(&security_handler);
+
+    security_handler_initialize_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_initialize_ReturnThruPtr_security_handler(&security_handler);
+
+    // Initialize core processor.
+    core_processor_t *core_processor = MCL_NULL;
+    core_processor_initialize(configuration, &core_processor);
+
+    // Mock http request.
+    mcl_http_request_t *http_request = NULL;
+    MCL_NEW(http_request);
+    http_request->header = MCL_NULL;
+    http_request->payload_size = 2;
+    http_request->payload = MCL_MALLOC(http_request->payload_size);
+    http_request->uri = MCL_NULL;
+    http_request->stream_data = MCL_NULL;
+
+    mcl_http_request_initialize_ExpectAnyArgsAndReturn(MCL_OK);
+    mcl_http_request_initialize_ReturnThruPtr_http_request(&http_request);
+    mcl_http_request_set_parameter_IgnoreAndReturn(MCL_OK);
+    mcl_http_request_add_header_IgnoreAndReturn(MCL_OK);
+
+    // Correlation-ID.
+    security_generate_random_bytes_ExpectAnyArgsAndReturn(MCL_OK);
+    mcl_http_request_add_header_IgnoreAndReturn(MCL_OK);
+
+    // Mock http client.
+    mcl_http_client_send_ExpectAnyArgsAndReturn(expected_http_client_error);
+
+    // Mock destroy functions.
+    mcl_http_request_destroy_Ignore();
+    mcl_http_response_destroy_Ignore();
+
+    mcl_error_t code = core_processor_register(core_processor);
+    TEST_ASSERT_EQUAL(expected_http_client_error, code);
+
+    // Clean up.
+    MCL_FREE(http_request->payload);
+    MCL_FREE(http_request);
+    MCL_FREE(security_handler->client_id);
+    MCL_FREE(security_handler->registration_access_token);
+    MCL_FREE(security_handler->client_secret);
+    MCL_FREE(security_handler->registration_uri);
+    MCL_FREE(security_handler);
+    mcl_http_client_destroy_Ignore();
+    security_handler_destroy_Ignore();
+    core_processor_destroy(&core_processor);
+    MCL_FREE(configuration->initial_access_token);
+    MCL_FREE(configuration->mindsphere_hostname);
+    MCL_FREE(configuration);
+}
+
+/**
  * GIVEN : Core processor is initialized using RSA security profile.
  * WHEN  : core_processor_update_credentials() is called.
  * THEN  : MCL_OK is returned.
@@ -1015,6 +1169,84 @@ void test_get_access_token_001(void)
     MCL_FREE(http_request);
     MCL_FREE(http_response->payload);
     MCL_FREE(http_response);
+    MCL_FREE(security_handler->access_token);
+    MCL_FREE(security_handler->last_token_time);
+    MCL_FREE(security_handler);
+    MCL_FREE(configuration->initial_access_token);
+    MCL_FREE(configuration->token_endpoint);
+    MCL_FREE(configuration->mindsphere_hostname);
+    MCL_FREE(configuration);
+}
+
+/**
+ * GIVEN : Http client failure.
+ * WHEN  : core_processor_get_access_token() is called.
+ * THEN  : MCL_FAIL is returned.
+ */
+void test_get_access_token_002(void)
+{
+    mcl_error_t expected_http_client_error = MCL_FAIL;
+
+    // Mock configuration.
+    core_configuration_t *configuration = MCL_NULL;
+    _create_configuration(MCL_SECURITY_SHARED_SECRET, "InitialAccessToken", &configuration);
+
+    security_initialize_IgnoreAndReturn(MCL_OK);
+    mcl_http_client_initialize_IgnoreAndReturn(MCL_OK);
+
+    // Mock security handler.
+    security_handler_t *security_handler = NULL;
+    _create_security_handler(&security_handler);
+
+    security_handler_initialize_ExpectAnyArgsAndReturn(MCL_OK);
+    security_handler_initialize_ReturnThruPtr_security_handler(&security_handler);
+
+    // Initialize core processor.
+    core_processor_t *core_processor = MCL_NULL;
+    core_processor_initialize(configuration, &core_processor);
+
+    // Mock jwt.
+    jwt_initialize_ExpectAnyArgsAndReturn(MCL_OK);
+    jwt_destroy_Ignore();
+
+    char *jwt_string = string_util_strdup("jwt_string");
+    jwt_get_token_ExpectAnyArgsAndReturn(jwt_string);
+
+    // Mock http request.
+    mcl_http_request_t *http_request = NULL;
+    MCL_NEW(http_request);
+    http_request->header = MCL_NULL;
+    http_request->payload_size = 500;
+    http_request->payload = MCL_MALLOC(http_request->payload_size);
+    http_request->uri = MCL_NULL;
+    http_request->stream_data = MCL_NULL;
+
+    mcl_http_request_initialize_ExpectAnyArgsAndReturn(MCL_OK);
+    mcl_http_request_initialize_ReturnThruPtr_http_request(&http_request);
+    mcl_http_request_set_parameter_IgnoreAndReturn(MCL_OK);
+    mcl_http_request_add_header_IgnoreAndReturn(MCL_OK);
+
+    // Correlation-ID.
+    security_generate_random_bytes_ExpectAnyArgsAndReturn(MCL_OK);
+
+    mcl_http_request_add_header_IgnoreAndReturn(MCL_OK);
+
+    // Mock http client.
+    mcl_http_client_send_ExpectAnyArgsAndReturn(expected_http_client_error);
+
+    // Mock destroy functions.
+    mcl_http_request_destroy_Ignore();
+    mcl_http_response_destroy_Ignore();
+
+    mcl_error_t code = core_processor_get_access_token(core_processor);
+    TEST_ASSERT_EQUAL(expected_http_client_error, code);
+
+    // Clean up.
+    mcl_http_client_destroy_Ignore();
+    security_handler_destroy_Ignore();
+    core_processor_destroy(&core_processor);
+    MCL_FREE(http_request->payload);
+    MCL_FREE(http_request);
     MCL_FREE(security_handler->access_token);
     MCL_FREE(security_handler->last_token_time);
     MCL_FREE(security_handler);
