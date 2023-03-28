@@ -6,8 +6,7 @@ Please check MCL reference documentation for details. MCL reference documentatio
 or a local copy can be generated when building MCL (see MCL Build Options).
 
 ## Introduction
-MindConnect Library (MCL), is a cross-platform C library wrapping MindSphere API to which clients, 
-or agents in MindSphere terms, are allowed to access. The connection to MindSphere platform is secured using TLS v1.2.
+MindConnect Library (MCL), is a cross-platform C library wrapping API's to which clients or agents are allowed to access the platform. The connection to platform is secured using TLS v1.2.
 
 MindConnect Library is distributed as source code. The source code is organized as a core component and extensions to the core component.
 
@@ -17,7 +16,7 @@ Including **mcl_core.h** in agent source code will enable all core component fun
 Data exchange and data point mapping functionalities will be available to agents with **Connectivity** component which is an extension to **Core** component.
 Including **mcl_connectivity.h** in agent source code will enable all connectivity component functionality together with core component functionality.
 
-Agents will be able to upload unstructured data to MindSphere Data Lake with **Data Lake** component of MCL 
+Agents will be able to upload unstructured data to Integrated Data Lake with **Data Lake** component of MCL 
 which is also an extension to **Core** component and it is independent of the **Connectivity** component. 
 Including **mcl_data_lake.h** in agent source code will enable all data lake component functionality together with core component functionality.
 
@@ -56,7 +55,7 @@ any components that it depends on.
 			ECDHE-RSA-AES128-GCM-SHA256
 			ECDHE-RSA-AES256-GCM-SHA384
 
-	In order to verify the correctness of the MindSphere's certificate
+	In order to verify the correctness of the Platforms's certificate
 	please enable host and peer verification.
 	
 -   If you want to have unit and integration test executables also built
@@ -382,20 +381,19 @@ For an agent application to use MCL, first step would be to initialize core conf
 and set the values of configuration parameters. See **mcl_core_configuration.h** for details.
 
 Core configuration data structure is then used to initialize MCL core component. The core component instance (**mcl_core_t**) 
-is later used to onboard the agent to MindSphere, rotate keys when required and retrieve access token for connectivity services. 
+is later used to onboard the agent, rotate keys when required and retrieve access token for connectivity services. 
 The core component handle is also required to initialize MCL connectivity extension. See **mcl_core.h** for details.
 
-To access to connectivity services of MindSphere, the agent must initialize MCL connectivity extension component.
-The connectivity extension instance (**mcl_connectivity_t**) is later used to exchange data with MindSphere. 
+To access to connectivity services, the agent must initialize MCL connectivity extension component.
+The connectivity extension instance (**mcl_connectivity_t**) is later used to exchange data. 
 See **mcl_connectivity.h** for details.
 
-The agent can exchange predefined data types or any custom data type to MindSphere with MCL. The predefined data types are 
+The agent can exchange predefined data types or any custom data type with MCL. The predefined data types are 
 data source configuration, timeseries, event and file. See **mcl_data_source_configuration.h**, **mcl_timeseries.h**, 
-**mcl_event.h** and **mcl_file.h** for details on how to create and exchange predefined data types with MindSphere.
+**mcl_event.h** and **mcl_file.h** for details on how to create and exchange predefined data types.
 For custom data type, see **mcl_custom_data.h**. 
 
-Note that, before exchanging timeseries data, data source configuration which describes the timeseries data has to be uploaded to MindSphere first 
-and then the data points in the data source configuration have to mapped to the corresponding properties of the asset. See **mcl_mapping.h** for 
+Note that, before exchanging timeseries data, data source configuration which describes the timeseries data has to be uploaded first and then the data points in the data source configuration have to mapped to the corresponding properties of the asset. See **mcl_mapping.h** for 
 data point mapping details.
 
 Agents have the option to exchange each data item a a single or they have the option to exchange multiple data items 
@@ -405,37 +403,36 @@ independent of their types together in a store (**mcl_store_t). See **mcl_store.
 You can find agent application examples using MCL in **/examples** folder of each component of MCL distribution.
 
 ### Example : Onboard
-This example agent onboards to MindSphere.
+This example onboards and Agent.
 Check <MCL_Source_Directory>/mcl_core/examples/onboard.c file for the implementation.
 
 ### Example : Data Source Configuration Upload
-This example agent uploads a data source configuration to MindSphere.
+This example uploads a data source configuration of the Agent.
 Check <MCL_Source_Directory>/mcl_connectivity/examples/dsc_upload.c file for the implementation.
 
 ### Example : Data Point Mapping
-This example agent creates mappings between the data points in the data source configuration 
-already uploaded to MindSphere and the properties of the asset in MindSphere.
+This example creates mappings between the data points in the data source configuration 
+of the Agent and the properties of the asset.
 Check <MCL_Source_Directory>/mcl_connectivity/examples/create_mapping.c file for the implementation.
 
 ### Example : Timeseries Upload
-This example agent uploads timeseries data to MindSphere given the data source configuration is 
-already uploaded and data point mappings are created.
+This example uploads timeseries data of the Agent with for given data source configuration.
 Check <MCL_Source_Directory>/mcl_connectivity/examples/timeseries_upload.c file for the implementation.
 
 ### Example : File Upload
-This example agent uploads a file to MindSphere.
+This example agent uploads a file.
 Check <MCL_Source_Directory>/mcl_connectivity/examples/file_upload.c file for the implementation.
 
 ### Example : Event Upload
-This example agent uploads an event to MindSphere.
+This example agent uploads an event.
 Check <MCL_Source_Directory>/mcl_connectivity/examples/event_upload.c file for the implementation.
 
 ### Example : Store Upload
-This example agent uploads a store containing file and timeseries items to MindSphere.
+This example agent uploads a store containing file and timeseries items.
 Check <MCL_Source_Directory>/mcl_connectivity/examples/event_upload.c file for the implementation.
 
 ### Example : Data Lake Object Upload
-This example agent uploads an object to MindSphere Data Lake.
+This example agent uploads an object to Integrated Data Lake.
 Check <MCL_Source_Directory>/mcl_data_lake/examples/data_lake_upload.c file for the implementation.
 
 ### Example : Deployment Workflow
