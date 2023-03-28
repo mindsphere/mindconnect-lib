@@ -16,7 +16,7 @@
 
 ## Features
 
-* MCL Deployment component is introduced for agents to access Deployment Workflow API of MindSphere.
+* MCL Deployment component is introduced for agents to access Deployment Workflow API's.
 
 # [4.2.4] (2020-11-28)
 
