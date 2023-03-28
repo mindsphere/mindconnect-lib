@@ -6,7 +6,7 @@ Please check MCL reference documentation for details. MCL reference documentatio
 or a local copy can be generated when building MCL (see MCL Build Options).
 
 ## Introduction
-MindConnect Library (MCL), is a cross-platform C library wrapping platform API's to which clients or agents are allowed to access. The connection to platform is secured using TLS v1.2.
+MindConnect Library (MCL), is a cross-platform C library wrapping API's to which clients or agents are allowed to access. The connection is secured using TLS v1.2.
 
 MindConnect Library is distributed as source code. The source code is organized as a core component and extensions to the core component.
 
@@ -416,7 +416,7 @@ of the Agent and the properties of the asset.
 Check <MCL_Source_Directory>/mcl_connectivity/examples/create_mapping.c file for the implementation.
 
 ### Example : Timeseries Upload
-This example agent uploads timeseries data given its data source configuration is 
+This example agent uploads timeseries data if its data source configuration is 
 already uploaded and data point mappings are created.
 Check <MCL_Source_Directory>/mcl_connectivity/examples/timeseries_upload.c file for the implementation.
 
