@@ -4,7 +4,7 @@
 
 * cJSON library version is upgraded to 1.7.15 since the old version had security vulnerabilities.
 * Minimum required OpenSSL version is updated to 1.1.1m for users using OpenSSL as security library and CMake as the build tool.
-* Minimum required libCurl version is updated to 7.81.0 for users using libCurl as http client and CMake as the build tool.
+* Minimum required libCurl version is updated to 7.81.0 for users using libCurl as http client and CMake as the build tool. 
 
 # [4.3.1] (2021-05-15)
 
