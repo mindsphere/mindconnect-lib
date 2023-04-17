@@ -14,6 +14,6 @@
 #define MCL_VERSION_PATCH 2
 
 #define MCL_VERSION_NUMBER        0x04030200
-#define MCL_VERSION_STRING        "4.3.2"
+#define MCL_VERSION_STRING        "4.3.3"
 
 #endif //MCL_VERSION_H_
