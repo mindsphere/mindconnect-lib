@@ -1,3 +1,7 @@
+# [4.3.4] (2023-04-03)
+## Certificate updates
+* InsightsHub certificate updated to DigiCert due to expiry
+
 # [4.3.3] (2023-04-03)
 ## Documentation
 * Documentation Changes.
