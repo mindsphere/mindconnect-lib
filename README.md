@@ -35,14 +35,19 @@ any components that it depends on.
 -   LibCurl is used as the default HTTP client in MCL but developers have the option to easily replace LibCurl with other HTTP client implementations.
 	Make sure LibCurl is installed on your system before building MCL if you are going to use LibCurl as the HTTP client. 
 	Steps to build LibCurl for your target system are described in the following sections of this document.
-	Developers are encouraged to use newer versions of LibCurl but note that MCL is tested with LibCurl version 7.81.0. 
+	Developers are encouraged to use newer versions of LibCurl but note that MCL is tested with LibCurl version 8.6.0. 
 
 	Please make sure your HTTP client implementation is configured to use TLS v1.2 implementation.
 
 -   OpenSSL is used as the default TLS and cryptography library but developers have the option to easily replace OpenSSL with other implementations. 
 	Make sure OpenSSL is installed on your system before building MCL if you are going to use OpenSSL as TLS and cryptography library. 
 	Steps to build OpenSSL are described in the following sections of this document.
-	Developers are encouraged to use newer versions of OpenSSL 1.1.x but note that MCL is tested with OpenSSL version 1.1.1m. 
+	Developers are encouraged to use newer versions of OpenSSL 3.0.x but note that MCL is tested with OpenSSL version 3.0.13. 
+
+    
+> [!IMPORTANT]
+> - Certificates in examples are for demo purpose only. Developers should always refer and use latest certificate published at [Insights Hub Documentation](https://documentation.mindsphere.io/MindSphere/resources/mindconnect-lib-v4/resources-mclib-cacert.html).
+> - It is advised to use the system's Trusted Certificate Store or an external certificate file, rather than hardcoding the certificate, to simplify future certificate rotations.  For Linux Systems Trusted Certificate Store location is /etc/ssl/certs, certificates present at this location will be referred while establishing connection. To understand more on Trusted Certificate Store, refer the [openssl documentation](https://docs.openssl.org/master/man7/ossl-guide-tls-introduction/#trusted-certificate-store).
 	
 	One of following ciphers must be supported and configured for SSL handshaking:
 
@@ -257,12 +262,12 @@ Both the core component and the connectivity extension will be built. See **MCL 
 These are the steps of the build process in order:
 
 ### Building OpenSSL
-Download OpenSSL package [openssl-1.1.1m.tar.gz](https://www.openssl.org/source/) and in your download directory run the following commands where
+Download OpenSSL package [openssl-3.0.13.tar.gz](https://www.openssl.org/source/) and in your download directory run the following commands where
 **\<OpenSSL_Install_Directory\>** refers to the directory you want to install OpenSSL:
 
 ```sh
-$ tar -xvzf openssl-1.1.1m.tar.gz
-$ cd openssl-1.1.1m
+$ tar -xvzf openssl-3.0.13.tar.gz
+$ cd openssl-3.0.13
 $ ./config --prefix=<OpenSSL_Install_Directory> -Wl,-rpath=<OpenSSL_Install_Directory>/lib shared -fPIC
 $ sudo make install
 ```
@@ -270,12 +275,12 @@ $ sudo make install
 Now, there must be a folder named **openssl** in **\<OpenSSL_Install_Directory\>/include** and shared objects named **libcrypto.so** and **libssl.so** in **\<OpenSSL_Install_Directory\>/lib**.
 
 ### Building Libcurl
-Download libcurl package [curl-7.81.0.tar.gz](https://curl.haxx.se/download/) and in your download directory run the following commands where
+Download libcurl package [curl-8.6.0.tar.gz](https://curl.haxx.se/download/) and in your download directory run the following commands where
 **\<libcurl_Install_Directory\>** refers to the directory you want to install libcurl:
 
 ```sh
-$ tar -xvzf curl-7.81.0.tar.gz
-$ cd curl-7.81.0
+$ tar -xvzf curl-8.6.0.tar.gz
+$ cd curl-8.6.0
 $ LDFLAGS="-Wl,-R<OpenSSL_Install_Directory>/lib" ./configure --enable-http --with-ssl=<OpenSSL_Install_Directory> --prefix=<libcurl_Install_Directory> --without-libssh2 --disable-ftp --disable-tftp --disable-file --disable-ldap --disable-rtsp --disable-dict --disable-telnet --disable-pop3 --disable-imap --disable-smb --disable-scp --disable-sftp --disable-smtp --disable-gopher --disable-manual
 $ sudo make install
 ```
