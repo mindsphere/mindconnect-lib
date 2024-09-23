@@ -1,5 +1,5 @@
-set openssl_version=1.1.1m
-set curl_version=7.81.0
+set openssl_version=3.0.13
+set curl_version=8.6.0
 set path_to_7zip="C:\Program Files\7-Zip"
 set path_to_visual_studio="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional"
 set main_directory=..\mcl_sandbox
@@ -15,7 +15,7 @@ powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.Secur
 %path_to_7zip%\7z e openssl-%openssl_version%.tar.gz
 %path_to_7zip%\7z x openssl-%openssl_version%.tar
 
-powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; wget http://curl.haxx.se/download/curl-%curl_version%.tar.gz -OutFile curl-%curl_version%.tar.gz}"
+powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; wget https://curl.se/download/curl-%curl_version%.tar.gz -OutFile curl-%curl_version%.tar.gz}"
 %path_to_7zip%\7z e curl-%curl_version%.tar.gz
 %path_to_7zip%\7z x curl-%curl_version%.tar
 

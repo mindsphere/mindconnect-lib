@@ -10,10 +10,10 @@
 #define MCL_VERSION_H_
 
 #define MCL_VERSION_MAJOR 4
-#define MCL_VERSION_MINOR 3
-#define MCL_VERSION_PATCH 2
+#define MCL_VERSION_MINOR 4
+#define MCL_VERSION_PATCH 0
 
-#define MCL_VERSION_NUMBER        0x04030200
-#define MCL_VERSION_STRING        "4.3.3"
+#define MCL_VERSION_NUMBER        0x04040000
+#define MCL_VERSION_STRING        "4.4.0"
 
 #endif //MCL_VERSION_H_

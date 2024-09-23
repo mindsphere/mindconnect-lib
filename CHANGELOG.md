@@ -1,3 +1,16 @@
+# [4.4.0] (2024-09-01)
+
+## Update dependencies and certificates
+
+* cJSON library version is upgraded to 1.7.18.
+* Minimum required OpenSSL version is updated to 3.0.13 for users using OpenSSL as security library.
+* Minimum required libCurl version is updated to 8.6.0 for users using libCurl as http client.
+* QuoVadis Root CA 2 G3" certificate will be retired on 2024-10-15T04:00:00.000Z hence code examples are updated to use existing certificate as well as new certificate i.e. "DigiCert Global Root G2".
+
+# [4.3.4] (2023-04-03)
+## Certificate updates
+* Insights Hub certificate update information publication
+
 # [4.3.3] (2023-04-03)
 ## Documentation
 * Documentation Changes.

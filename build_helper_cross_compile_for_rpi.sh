@@ -1,6 +1,8 @@
+# This is deprecated. Use build_helper_linux.sh and modify accordingly. 
+
 #!/bin/bash
-openssl_version=1.1.1m
-curl_version=7.81.0
+openssl_version=3.0.13
+curl_version=8.6.0
 main_directory=../mcl_sandbox_for_rpi
 mcl_directory=$(pwd)
 
@@ -16,7 +18,7 @@ rpi_tool_path=$main_directory/raspberrypi_tools/arm-bcm2708/arm-linux-gnueabihf
 wget -c https://www.openssl.org/source/openssl-$openssl_version.tar.gz
 tar -xvzf openssl-$openssl_version.tar.gz
 
-wget https://curl.haxx.se/download/curl-$curl_version.tar.gz
+wget https://curl.se/download/curl-$curl_version.tar.gz
 tar -xvzf curl-$curl_version.tar.gz
 
 cd openssl-$openssl_version
