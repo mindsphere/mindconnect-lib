@@ -12,8 +12,8 @@
 #include "mcl_core/mcl_string_util.h"
 
 // Connectivity exchange api.
-static const char _connectivity_exchange_uri[] = "/api/mindconnect/v3/exchange";
-static const char _connectivity_mapping_url[] = "/api/mindconnect/v3/dataPointMappings";
+static const char _connectivity_exchange_uri[] = "/mindconnect-1000001700/v3/exchange";
+static const char _connectivity_mapping_url[] = "/mindconnect-1000001700/v3/dataPointMappings";
 
 // This function sets core parameter of connectivity configuration.
 static mcl_error_t _set_connectivity_configuration_core_parameter(mcl_connectivity_configuration_t *configuration, mcl_core_t *core);
