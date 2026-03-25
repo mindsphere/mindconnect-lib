@@ -2,7 +2,7 @@
 
 ## Certificate updates
 
-* FDS gateway will use "DigiCert TLS RSA4096 Root G5" certificate in future. Hence code examples are being updated to use existing "DigiCert Global Root G2" certificate as well as new "DigiCert Root CA 2 G5"certificate. Note that "QuoVadis Root CA 2 G3" will not work.
+* FDS gateway will use "DigiCert TLS RSA4096 Root G5" certificate in future. Hence code examples are being updated to use existing "DigiCert Global Root G2" certificate as well as new "DigiCert Root CA 2 G5"certificate.
 
 ## FDS gateway url changes 
 
