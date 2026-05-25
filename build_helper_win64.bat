@@ -1,7 +1,7 @@
-set openssl_version=3.0.13
-set curl_version=8.6.0
+set openssl_version=3.5.2
+set curl_version=8.16.0
 set path_to_7zip="C:\Program Files\7-Zip"
-set path_to_visual_studio="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional"
+set path_to_visual_studio="C:\apps\MVS16"
 set main_directory=..\mcl_sandbox
 set mcl_directory=%cd%
 
@@ -11,11 +11,11 @@ cd %main_directory%
 rem Change relative path to absolute.
 set main_directory="%cd%"
 
-powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; wget https://www.openssl.org/source/openssl-%openssl_version%.tar.gz -OutFile openssl-%openssl_version%.tar.gz}"
+powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls13; wget https://www.openssl.org/source/openssl-%openssl_version%.tar.gz -OutFile openssl-%openssl_version%.tar.gz}"
 %path_to_7zip%\7z e openssl-%openssl_version%.tar.gz
 %path_to_7zip%\7z x openssl-%openssl_version%.tar
 
-powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; wget https://curl.se/download/curl-%curl_version%.tar.gz -OutFile curl-%curl_version%.tar.gz}"
+powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls13; wget https://curl.se/download/curl-%curl_version%.tar.gz -OutFile curl-%curl_version%.tar.gz}"
 %path_to_7zip%\7z e curl-%curl_version%.tar.gz
 %path_to_7zip%\7z x curl-%curl_version%.tar
 
@@ -29,10 +29,10 @@ nmake install_sw
 cd ..
 
 cd curl-%curl_version%\winbuild
-nmake /f Makefile.vc mode=dll VC=16 WITH_SSL=dll MACHINE=x64 WITH_PREFIX=%main_directory%\install\ SSL_PATH=%main_directory%\install
+nmake /f Makefile.vc WINBUILD_ACKNOWLEDGE_DEPRECATED=yes mode=dll VC=16 WITH_SSL=dll MACHINE=x64 WITH_PREFIX=%main_directory%\install\ SSL_PATH=%main_directory%\install
 cd ../..
 
 mkdir mcl_build
 cd mcl_build
-cmake -DCMAKE_PREFIX_PATH="%main_directory%/install" -A x64 -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX:PATH=%main_directory%/install -DMCL_STATICLIB=OFF -DMCL_LOG_LEVEL=MCL_LOG_LEVEL_NONE %mcl_directory%
+cmake -DCMAKE_PREFIX_PATH="%main_directory%/install" -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX:PATH=%main_directory%/install -DMCL_STATICLIB=OFF -DMCL_LOG_LEVEL=MCL_LOG_LEVEL_NONE %mcl_directory%
 cmake --build . --clean-first --target install

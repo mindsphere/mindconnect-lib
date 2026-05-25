@@ -12,7 +12,7 @@
 #include "mcl_core/mcl_string_util.h"
 
 // Endpoint for generating a signed url to upload data to.
-static const char _upload_url_generation_endpoint[] = "/api/datalake/v3/generateUploadObjectUrls";
+static const char _upload_url_generation_endpoint[] = "/datalake-1000001700/v3/generateUploadObjectUrls";
 
 // This function sets core parameter of data lake configuration.
 static mcl_error_t _set_data_lake_configuration_core_parameter(mcl_data_lake_configuration_t *configuration, mcl_core_t *core);

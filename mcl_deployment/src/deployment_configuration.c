@@ -12,7 +12,7 @@
 #include "mcl_core/mcl_string_util.h"
 
 // Endpoint to list deployment workflows.
-static const char workflow_instances_endpoint[] = "/api/deploymentworkflow/v3/instances";
+static const char workflow_instances_endpoint[] = "/deploymentworkflow-1000001700/v3/instances";
 
 // This function sets core parameter of component configuration.
 static mcl_error_t _set_deployment_configuration_core_parameter(mcl_deployment_configuration_t *configuration, mcl_core_t *core);

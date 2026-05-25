@@ -124,7 +124,7 @@ void test_set_parameter_003()
     // Check results.
     TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "mcl_data_lake_configuration_set_parameter() failed.");
     TEST_ASSERT_EQUAL_PTR_MESSAGE(core, configuration->core, "Core parameter is wrong.");
-    TEST_ASSERT_EQUAL_STRING_MESSAGE("hostname/api/datalake/v3/generateUploadObjectUrls", configuration->upload_url_generation_url, "Upload url is wrong.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("hostname/datalake-1000001700/v3/generateUploadObjectUrls", configuration->upload_url_generation_url, "Upload url is wrong.");
 
     // Clean up.
     mcl_data_lake_configuration_destroy(&configuration);

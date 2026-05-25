@@ -77,8 +77,8 @@ static mcl_error_t _process_registration_response_rsa_3072(core_processor_t *cor
 // This is the array for endpoints.
 static const char *endpoint_uri[ENDPOINT_URI_END] =
 {
-    "/api/agentmanagement/v3/oauth/token",
-    "/api/agentmanagement/v3/register"
+    "/agentmanagement-1000001700/v3/oauth/token",
+    "/agentmanagement-1000001700/v3/register"
 };
 
 // Content type values.
@@ -319,6 +319,9 @@ mcl_error_t core_processor_register(core_processor_t *core_processor)
         registration_uri = core_processor->security_handler->registration_uri;
     }
 
+    MCL_INFO("registration_uri in core_processer = \"%s\".", registration_uri);
+
+
     MCL_ASSERT_STATEMENT_CODE_MESSAGE(MCL_OK == result, MCL_FREE(payload), result, "Payload for register endpoint can not be constructed.");
 
     // Auth header value length including null character size.
@@ -393,7 +396,7 @@ mcl_error_t core_processor_register(core_processor_t *core_processor)
         // Send the onboarding request and retrieve the response.
         if (MCL_OK != (result = mcl_http_client_send(core_processor->http_client, http_request, &http_response)))
         {
-            MCL_ERROR("HTTP client error when accessing /register endpoint.");
+            MCL_ERROR("HTTP client error when accessing /register endpoint. = <%d>", result);
         }
         else
         {

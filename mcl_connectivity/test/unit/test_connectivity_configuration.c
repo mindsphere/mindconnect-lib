@@ -128,7 +128,7 @@ void test_set_parameter_004()
     // Check results.
     TEST_ASSERT_EQUAL_MESSAGE(MCL_OK, code, "mcl_connectivity_configuration_set_parameter() failed.");
     TEST_ASSERT_EQUAL_PTR_MESSAGE(core, configuration->core, "Core parameter is wrong.");
-    TEST_ASSERT_EQUAL_STRING_MESSAGE("hostname/api/mindconnect/v3/exchange", configuration->exchange_url, "Core parameter is wrong.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("hostname/mindconnect-1000001700/v3/exchange", configuration->exchange_url, "Core parameter is wrong.");
 
     // Clean up.
     mcl_connectivity_configuration_destroy(&configuration);

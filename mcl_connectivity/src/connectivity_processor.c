@@ -385,7 +385,7 @@ mcl_error_t connectivity_processor_get_data_source_configuration(connectivity_pr
     // Calculate url length.
     agent_id_length = mcl_string_util_strlen(connectivity_processor->agent_id);
     hostname_length = mcl_string_util_strlen(connectivity_processor->hostname);
-    url_length = hostname_length + agent_id_length + sizeof("/api/agentmanagement/v3/agents//dataSourceConfiguration");
+    url_length = hostname_length + agent_id_length + sizeof("/agentmanagement-1000001700/v3/agents//dataSourceConfiguration");
 
     url = MCL_MALLOC(url_length);
 
@@ -400,8 +400,8 @@ mcl_error_t connectivity_processor_get_data_source_configuration(connectivity_pr
         mcl_string_util_memcpy(position, connectivity_processor->hostname, hostname_length);
         position += hostname_length;
 
-        mcl_string_util_memcpy(position, "/api/agentmanagement/v3/agents/", sizeof("/api/agentmanagement/v3/agents/") - MCL_NULL_CHAR_SIZE);
-        position += sizeof("/api/agentmanagement/v3/agents/") - MCL_NULL_CHAR_SIZE;
+        mcl_string_util_memcpy(position, "/agentmanagement-1000001700/v3/agents/", sizeof("agentmanagement-1000001700/v3/agents/") - MCL_NULL_CHAR_SIZE);
+        position += sizeof("/agentmanagement-1000001700/v3/agents/") - MCL_NULL_CHAR_SIZE;
 
         mcl_string_util_memcpy(position, connectivity_processor->agent_id, agent_id_length);
         position += agent_id_length;

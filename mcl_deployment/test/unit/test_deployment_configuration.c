@@ -78,7 +78,7 @@ void test_set_parameter_001(void)
     // Check results.
     TEST_ASSERT_EQUAL(MCL_OK, code);
     TEST_ASSERT_EQUAL_PTR(core, configuration->core);
-    TEST_ASSERT_EQUAL_STRING("hostname/api/deploymentworkflow/v3/instances", configuration->workflow_instances_url);
+    TEST_ASSERT_EQUAL_STRING("hostname/deploymentworkflow-1000001700/v3/instances", configuration->workflow_instances_url);
 
     // Clean up.
     mcl_deployment_configuration_destroy(&configuration);
