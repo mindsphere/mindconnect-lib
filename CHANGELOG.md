@@ -2,11 +2,11 @@
 
 ## Certificate updates
 
-* FDS gateway will use "DigiCert TLS RSA4096 Root G5" certificate in future. Hence code examples are being updated to use existing "DigiCert Global Root G2" certificate as well as new "DigiCert Root CA 2 G5"certificate.
+* Xcelerator gateway will use "DigiCert TLS RSA4096 Root G5" certificate in future. Hence code examples are being updated to use existing "DigiCert Global Root G2" certificate as well as new "DigiCert Root CA 2 G5"certificate.
 
-## FDS gateway url changes 
+## Xcelerator gateway url changes
 
-* Change the gateway url to FDS gateway instead of Insights Hub gateway
+* Change the gateway url to Xcelerator gateway instead of Insights Hub gateway
 
 ## Security
 
